@@ -22,36 +22,56 @@
  * http://sailsjs.org/#documentation
  */
 
-module.exports = {
+var fs = require('fs');
+var _ = require('lodash');
+var logger = require('graceful-logger');
+var defaults = require('./env/defaults');
+
+module.exports = (function(){
+  var envConfigPath = defaults.config.paths.environments + '/' + defaults.environment + '.js';
+  var env = {};
+
+  if (fs.existsSync(envConfigPath)) {
+    var env = require(envConfigPath).env;
+    logger.info('Loaded environment config for ' + defaults.environment + '.');
+  }else {
+    logger.info('Environment config for ' + defaults.environment +' not found.');
+  }
+  return env;
+}());
 
 
-  // The `port` setting determines which TCP port your app will be deployed on
-  // Ports are a transport-layer concept designed to allow many different
-  // networking applications run at the same time on a single computer.
-  // More about ports: http://en.wikipedia.org/wiki/Port_(computer_networking)
-  // 
-  // By default, if it's set, Sails uses the `PORT` environment variable.
-  // Otherwise it falls back to port 1337.
-  //
-  // In production, you'll probably want to change this setting 
-  // to 80 (http://) or 443 (https://) if you have an SSL certificate
 
-  port: process.env.PORT || 1337,
+// module.exports = {
 
 
+//   // The `port` setting determines which TCP port your app will be deployed on
+//   // Ports are a transport-layer concept designed to allow many different
+//   // networking applications run at the same time on a single computer.
+//   // More about ports: http://en.wikipedia.org/wiki/Port_(computer_networking)
+//   // 
+//   // By default, if it's set, Sails uses the `PORT` environment variable.
+//   // Otherwise it falls back to port 1337.
+//   //
+//   // In production, you'll probably want to change this setting 
+//   // to 80 (http://) or 443 (https://) if you have an SSL certificate
 
-  // The runtime "environment" of your Sails app is either 'development' or 'production'.
-  //
-  // In development, your Sails app will go out of its way to help you
-  // (for instance you will receive more descriptive error and debugging output)
-  //
-  // In production, Sails configures itself (and its dependencies) to optimize performance.
-  // You should always put your app in production mode before you deploy it to a server-
-  // This helps ensure that your Sails app remains stable, performant, and scalable.
-  // 
-  // By default, Sails sets its environment using the `NODE_ENV` environment variable.
-  // If NODE_ENV is not set, Sails will run in the 'development' environment.
+//   port: process.env.PORT || 1337,
 
-  environment: process.env.NODE_ENV || 'development'
 
-};
+
+//   // The runtime "environment" of your Sails app is either 'development' or 'production'.
+//   //
+//   // In development, your Sails app will go out of its way to help you
+//   // (for instance you will receive more descriptive error and debugging output)
+//   //
+//   // In production, Sails configures itself (and its dependencies) to optimize performance.
+//   // You should always put your app in production mode before you deploy it to a server-
+//   // This helps ensure that your Sails app remains stable, performant, and scalable.
+//   // 
+//   // By default, Sails sets its environment using the `NODE_ENV` environment variable.
+//   // If NODE_ENV is not set, Sails will run in the 'development' environment.
+
+//   environment: process.env.NODE_ENV || 'development'
+
+// };
