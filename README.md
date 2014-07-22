@@ -1,0 +1,2 @@
+# gdGame
+### a Sails application
