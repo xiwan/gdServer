@@ -11,6 +11,7 @@
  * For more information on adapter configuration, check out:
  * http://sailsjs.org/#documentation
  */
+'use strict';
 
 var fs = require('fs');
 var _ = require('lodash');

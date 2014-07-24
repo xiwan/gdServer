@@ -1,0 +1,34 @@
+<div class="container clearfix">
+
+<h2>admin site</h2>
+<hr />
+<h3>world register</h3>
+	<form id="worldCreateForm" >
+		<div>name: <input name="name" value="" /> </div>
+		<div>port:<input name="port" value="" /> </div>
+		<div>capacity: <input name="capacity" value="" /> </div>
+		<div><input id="worldCreateBtn" type="button" value="create"/></div>
+	</form>
+
+</div>
+
+<script type='text/javascript'>
+	$("#worldCreateBtn").click(function(){
+		$.ajax({
+			type: 'POST',
+			url: '/admin/world/create',
+			data: {
+				name: $("#worldCreateForm").find("input[name='name']").val(), 
+				port: $("#worldCreateForm").find("input[name='port']").val(), 
+				cap: $("#worldCreateForm").find("input[name='capacity']").val(), 
+			},
+			success: function (){
+				alert('ok');
+			},
+			error: function(){
+				alert('error');
+			}
+		});
+	});
+
+</script>

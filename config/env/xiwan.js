@@ -1,4 +1,8 @@
+var bcrypt = require('bcrypt-nodejs');
+
 module.exports = {
+
+	salt: 'bacon',
 
 	env: {
 		port: 8080,		
@@ -30,5 +34,7 @@ module.exports = {
 	      	}]
 	    }
 		},
+
+
 	},
 }

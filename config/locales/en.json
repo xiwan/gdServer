@@ -1,3 +1,14 @@
 {
-  "Welcome": "Welcome"
+	"100": "password '%s' not matched rptpassword '%s'.",
+	"101": "password is invalid'.",
+
+	"111": "duplicated username.",
+	"112": "not existed username.",
+	
+	"200": "ok",
+
+	"400": "bad request",
+	"403": "forbidden",
+	"404": "not found",
+	"500": "internal error"
 }
