@@ -5,14 +5,14 @@
 <hr />
 
 	<form id="loginForm" >
-		<div>nickname: <input name="nickname" value="" /> </div>
+		<div>username: <input name="username" value="" /> </div>
 		<div>password:<input name="password" value="" /> </div>
 		<div><input id="loginBtn" type="button" value="login"/></div>
 	</form>
 <h2>Register page</h2>
 <hr />
 	<form id="registerForm" >
-		<div>nickname: <input name="nickname" value="" /> </div>
+		<div>username: <input name="username" value="" /> </div>
 		<div>phoneNumber: <input name="phoneNumber" value="" /> </div>
 		<div>password:<input name="password" value="" /> </div>
 		<div>Repeat Password:<input name="rptpassword" value="" /> </div>
@@ -27,9 +27,9 @@
 	$("#loginBtn").click(function(){
 		$.ajax({
 			type: 'POST',
-			url: '/gate/user/login',
+			url: '/gate/user/login?lang=en',
 			data: {
-				nickname: $("#loginForm").find("input[name='nickname']").val(), 
+				username: $("#loginForm").find("input[name='username']").val(), 
 				password: $("#loginForm").find("input[name='password']").val(), 
 			},
 			success: function (data){
@@ -46,7 +46,7 @@
 			type: 'POST',
 			url: '/gate/user/create?lang=en',
 			data: {
-				nickname: $("#registerForm").find("input[name='nickname']").val(), 
+				username: $("#registerForm").find("input[name='username']").val(), 
 				phoneNumber: $("#registerForm").find("input[name='phoneNumber']").val(), 
 				password: $("#registerForm").find("input[name='password']").val(), 
 				rptpassword: $("#registerForm").find("input[name='rptpassword']").val(), 

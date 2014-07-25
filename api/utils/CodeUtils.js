@@ -1,3 +1,41 @@
+module.exports = CodeUtils;
+
+function CodeUtils(res, code, params) {
+  var codeMsg = {};
+  codeMsg.code = code||CodeUtils.NORMAL;
+  codeMsg.data = null;
+  if (params){
+    codeMsg.msg = res.i18n.apply(this, array_merge([codeMsg.code], params));
+  }else{
+    codeMsg.msg  = res.i18n(codeMsg.code);
+  }
+  return codeMsg;
+}
+
+/*
+  ATTENTION: the suffix number identify how many parameters need to be passed.
+  Thus, this how we call it:
+      var msg = msgUtils(res, msgUtils.PASSWORD_NOT_MATCHED, [password, rptpassword]);
+*/
+
+CodeUtils.PASSWORD_NOT_MATCHED = 100;
+CodeUtils.PASSWORD_INVALID = 101;
+
+CodeUtils.USER_INVALID = 110;
+CodeUtils.USER_DUPLICATE = 111;
+CodeUtils.USER_NONE = 112;
+
+CodeUtils.WORLD_DUPLICATE = 120;
+CodeUtils.WORLD_NONE = 121;
+
+CodeUtils.NORMAL = 200;
+CodeUtils.BAD_REQUEST = 400;
+CodeUtils.FORBIDDENT = 403;
+CodeUtils.NOT_FOUND = 404;
+CodeUtils.ERROR_INTERNAL = 500;
+
+
+
 function array_merge() {
   //   example 1: arr1 = {"color": "red", 0: 2, 1: 4}
   //   example 1: arr2 = {0: "a", 1: "b", "color": "green", "shape": "trapezoid", 2: 4}
@@ -57,37 +95,5 @@ function array_merge() {
 }
 
 
-function CodeUtils(res, code, params) {
-	var codeMsg = {};
-	codeMsg.code = code||200;
-	codeMsg.data = null;
-	if (params){
-		codeMsg.msg = res.i18n.apply(this, array_merge([codeMsg.code], params));
-	}else{
-		codeMsg.msg  = res.i18n(codeMsg.code);
-	}
-	return codeMsg;
-}
-
-/*
-	ATTENTION: the suffix number identify how many parameters need to be passed.
-	PASSWORD_NOT_MATCHED_2 means 2 params needed.
-	Thus, this how we call it:
-			var msg = msgUtils(res, msgUtils.PASSWORD_NOT_MATCHED_2, [password, rptpassword]);
-*/
-
-CodeUtils.PASSWORD_NOT_MATCHED_2 = 100;
-CodeUtils.PASSWORD_INVALID = 101;
-
-CodeUtils.USER_INVALID_1 = 110;
-CodeUtils.USER_DUPLICATE = 111;
-CodeUtils.USER_NONE = 112;
-
-CodeUtils.NORMAL = 200;
-CodeUtils.BAD_REQUEST = 400;
-CodeUtils.FORBIDDENT = 403;
-CodeUtils.NOT_FOUND = 404;
-CodeUtils.ERROR_INTERNAL = 500;
 
 
-module.exports = CodeUtils;

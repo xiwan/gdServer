@@ -3,7 +3,7 @@
 	"101": "password is invalid'.",
 
 	"111": "duplicated username.",
-	"112": "not existed username.",
+	"112": "not existed username or wrong password.",
 	
 	"200": "ok",
 

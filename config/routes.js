@@ -44,7 +44,7 @@ module.exports.routes = {
   'post /gate/world/choose': 'GateController.worldChoose',
 
   '/admin': {
-    view: 'admin/index'
+    view: 'admin/index',
   },
   'get /admin/world/list': 'AdminController.worldList',
   'post /admin/world/create': 'AdminController.worldCreate',

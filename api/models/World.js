@@ -1,5 +1,7 @@
 'use strict';
 
+var logger =require('../utils/LoggerUtils');
+
 var World = {
 
   attributes: {
@@ -33,7 +35,6 @@ var World = {
   		type: 'integer',
   		defaultsTo: 0,
   	},
-
 
 		toJSON: function(){
 			var obj = this.toObject();

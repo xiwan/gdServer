@@ -7,6 +7,8 @@ client.on("error", function(err){
 
 var RedisUtils = {};
 
-RedisUtils.test = function () {
-	console.log("test")
+RedisUtils.conn = function () {
+	
 }
+
+module.exports = RedisUtils;

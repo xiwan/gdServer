@@ -2,35 +2,46 @@
 'use strict';
 
 var async = require('async');
-var code = require('../utils/CodeUtils');
+var logger = require('../utils/LoggerUtils');
 
 var GateController = {};
 
 // user login
 GateController.userLogin = function(req, res) {
-	var nickname = req.param('nickname');
+	var gateService = new GateService(res);
+	var sessionService = new SessionService(res);
+
+	var username = req.param('username');
 	var password = req.param('password');
 
+	logger.debug("xxxx");
+
 	async.waterfall([
-		function(next){
-			GateService.loginUser(res, nickname, password, next);
+		function (next){
+			gateService.loginUser(username, password, next);
 		},
+		function (preRslt, next){
+			sessionService.test(preRslt, next);
+		}
 	], function(err, rslt){
 		if (err) return res.send(err, 500);
 		res.json(rslt);
 	});
+
 };
 
 // user create
 GateController.userCreate = function(req, res) {
-	var nickname = req.param('nickname');
+	var gateService = new GateService(res);
+
+	var username = req.param('username');
 	var phoneNumber = req.param('phoneNumber');
 	var password = req.param('password');
 	var rptpassword = req.param('rptpassword');
 
 	async.waterfall([
 		function(next){
-			GateService.createUser(res, nickname, phoneNumber, password, rptpassword, next);
+			gateService.createUser(username, phoneNumber, password, rptpassword, next);
 		},
 	], function(err, rslt){
 		if (err) return res.send(err, 500);
@@ -44,17 +55,15 @@ GateController.userWeak = function(req, res) {
 
 // list all worlds
 GateController.worldList = function(req, res) {
+	var gateService = new GateService(res);
+	
 	async.waterfall([
 		function (next) {
-			GateService.listWorld(next);
+			gateService.listWorld(next);
 		},
-	], function(err, worlds){
+	], function(err, rslt){
 		if (err) return res.send(err, 500);
-		if (worlds == null || !worlds.length) {
-			res.json("no worlds");
-		}else {
-			res.json(worlds);
-		}
+		res.json(rslt);
 	});
 };
 

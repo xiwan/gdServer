@@ -15,7 +15,7 @@
 
 var fs = require('fs');
 var _ = require('lodash');
-var logger = require('graceful-logger');
+var logger = require('../api/utils/LoggerUtils');
 var defaults = require('./env/defaults');
 
 module.exports.adapters = (function(){
