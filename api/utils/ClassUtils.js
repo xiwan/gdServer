@@ -7,6 +7,7 @@ module.exports = ClassUtils;
 
 function ClassUtils(){
 	this.classname = "Class";
+	this.cache = sails.config.cache;
 };
 
 ClassUtils.prototype.info = function() {

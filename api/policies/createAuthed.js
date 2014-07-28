@@ -15,9 +15,9 @@ module.exports = function(req, res, cb) {
 			filter.lang(req, res, next);
 		},
 
-		// master data version check
+		// is authed user ?
 		function(underMaintenance, next) {
-				filter.version(req, res, next);
+				filter.isAuthed(req, res, next);
 		},
 	], function(err, data){
 		if (err) return cb(err);

@@ -28,8 +28,10 @@ module.exports.bootstrap = function (cb) {
 
 function redisInit(config) {
 	var redis = new redisUtils(config.port, config.host);
-	sails.config.redis = redis.client;
 
+	// bind the client to global cache;
+	sails.config.cache = redis.client;
+	// check if cache is working
 	redis.checkIfRedisWorking(function(err){
 		if (err) {
       return redis.warn(

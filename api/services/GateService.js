@@ -24,7 +24,7 @@ GateService.prototype.createUser = function(username, phoneNumber, password, rpt
 
 	async.waterfall([
 		function (next){
-			User.getOne(false, username, null, next);
+			User.getOne(username, next);
 		},
 		function (user, next){
 			if (user) {
@@ -46,11 +46,10 @@ GateService.prototype.createUser = function(username, phoneNumber, password, rpt
 
 GateService.prototype.loginUser = function(username, password, cb) {
 	var self = this;
-	self.debug("xxxxxxxxxx");
 
 	async.waterfall([
 		function(next){
-			User.getOne(true, username, password, next);
+			User.getOneByUserAndPass(username, password, next);
 		},
 		function (user, next){
 			if (user) {

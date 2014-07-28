@@ -44,7 +44,7 @@
 	$("#registerBtn").click(function(){
 		$.ajax({
 			type: 'POST',
-			url: '/gate/user/create?lang=en',
+			url: '/gate/user/create',
 			data: {
 				username: $("#registerForm").find("input[name='username']").val(), 
 				phoneNumber: $("#registerForm").find("input[name='phoneNumber']").val(), 
