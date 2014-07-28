@@ -1,3 +1,6 @@
+
+var util = require('util');
+
 module.exports = CodeUtils;
 
 function CodeUtils(res, code, params) {
@@ -11,6 +14,14 @@ function CodeUtils(res, code, params) {
   }
   return codeMsg;
 }
+
+CodeUtils.Error = function(name) {
+  Error.captureStackTrace(this, this);
+  this.name =name;
+  this.message = CodeUtils[name];
+}
+
+util.inherits(CodeUtils.Error, Error);
 
 /*
   ATTENTION: the suffix number identify how many parameters need to be passed.
@@ -28,13 +39,14 @@ CodeUtils.USER_NONE = 112;
 CodeUtils.WORLD_DUPLICATE = 120;
 CodeUtils.WORLD_NONE = 121;
 
+CodeUtils.MISS_VERSION = 1000;
+CodeUtils.SERVICE_UNAVAILABLE = 1001;
+
 CodeUtils.NORMAL = 200;
 CodeUtils.BAD_REQUEST = 400;
-CodeUtils.FORBIDDENT = 403;
+CodeUtils.FORBIDDEN = 403;
 CodeUtils.NOT_FOUND = 404;
 CodeUtils.ERROR_INTERNAL = 500;
-
-
 
 function array_merge() {
   //   example 1: arr1 = {"color": "red", 0: 2, 1: 4}

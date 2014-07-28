@@ -16,7 +16,7 @@ module.exports.bootstrap = function (cb) {
   var env = sails.config[sails.config.environment];
   if (env.redis) {
   	
-  	loadRedis(env.redis);
+  	//loadRedis(env.redis);
   }else if (env.memcached) {
   	
   }else {

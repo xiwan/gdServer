@@ -2,7 +2,6 @@
 'use strict';
 
 var async = require('async');
-var logger = require('../utils/LoggerUtils');
 
 var GateController = {};
 
@@ -14,14 +13,16 @@ GateController.userLogin = function(req, res) {
 	var username = req.param('username');
 	var password = req.param('password');
 
-	logger.debug("xxxx");
-
 	async.waterfall([
 		function (next){
 			gateService.loginUser(username, password, next);
 		},
-		function (preRslt, next){
-			sessionService.test(preRslt, next);
+		function (rslt, next){
+			if (sessionService.checkpoint(rslt)) {
+				sessionService.create(username, next);
+			}else {
+				next(null, rslt)
+			}
 		}
 	], function(err, rslt){
 		if (err) return res.send(err, 500);

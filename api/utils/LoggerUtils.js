@@ -9,20 +9,22 @@ var logger = require("graceful-logger");
 
 var LoggerUtils = {};
 
+LoggerUtils.level = function(level) {
+	logger.setLevel("[" + level + "]");
+};
+
 LoggerUtils.info = function(){
 	if (arguments){
 		logger.format(':level.green :msg.green');
 		logger.info.apply(this, arguments);
-	}
-	
+	}	
 };
 
 LoggerUtils.debug = function(){
 	if (arguments){
 		logger.format(':level.cyan :msg.cyan');
 		logger.debug.apply(this, arguments);
-	}
-	
+	}	
 };
 
 LoggerUtils.warn = function(){

@@ -7,7 +7,6 @@
  */
 
 var crypt = require('../utils/CryptUtils');
-var logger = require('../utils/LoggerUtils');
 
 var User = {
 
@@ -65,7 +64,7 @@ var User = {
   },
 
   beforeCreate: function(values, next){
-  	crypt.md5(values.password, function(err, hash){
+  	crypt.md5(values.password, null, function(err, hash){
   		if(err) return next(err);
   		var date = new Date();
 	  	values.lastLoginAt = date;
@@ -107,7 +106,7 @@ User.getOne = function(flag, username, password, cb){
 				cb(err, user);
 			});		
 	} else {
-		crypt.md5(password, function(err, hash){
+		crypt.md5(password, null, function(err, hash){
   		if(err) return next(err);
 			self
 				.findOne()

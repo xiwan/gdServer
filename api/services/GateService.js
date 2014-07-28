@@ -3,11 +3,13 @@ var util = require('util');
 var async = require('async');
 var BaseService = require('./BaseService');
 var logger = require('../utils/LoggerUtils');
+//var log = require('../utils/LogUtils');
 
 module.exports = GateService;
 
 function GateService(res) {
 	GateService.super_.apply(this, arguments);
+	this.classname = "GateService";
 }
 
 util.inherits(GateService, BaseService);
@@ -44,6 +46,7 @@ GateService.prototype.createUser = function(username, phoneNumber, password, rpt
 
 GateService.prototype.loginUser = function(username, password, cb) {
 	var self = this;
+	self.debug("xxxxxxxxxx");
 
 	async.waterfall([
 		function(next){
