@@ -25,7 +25,16 @@ SessionService.prototype.create = function(username, cb){
 		// now we have to store the sessionId and sessionToken pair into redis/db
 		// and the return the sessionId to the client side; {sid: xxxxxxx}
 
-		cb(null, self.rslt);
+			
+		sails.config.redis.set(sessionid, session, function(err, result){
+			if (err) {
+				self.err(err);
+			}
+			self.debug("xxxxx", result);
+
+			cb(null, self.rslt);
+		});
+
 	});
 }
 

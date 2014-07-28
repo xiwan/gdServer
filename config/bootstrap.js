@@ -7,7 +7,8 @@
  * For more information on bootstrapping your app, check out:
  * http://sailsjs.org/#documentation
  */
-var logger = require('../api/utils/LoggerUtils');
+
+var redisUtils = require('../api/utils/RedisUtils');
 
 module.exports.bootstrap = function (cb) {
 
@@ -15,35 +16,30 @@ module.exports.bootstrap = function (cb) {
   // with the bootstrap!  (otherwise your server will never lift, since it's waiting on the bootstrap)
   var env = sails.config[sails.config.environment];
   if (env.redis) {
-  	
-  	//loadRedis(env.redis);
+  	redisInit(env.redis);
   }else if (env.memcached) {
   	
   }else {
-  	logger.warn("no cache found!");
+  	sails.log.warn("no cache found!");
   }
-
   cb();
 };
 
 
-function loadRedis(config) {
-	logger.info("start loading redis");
+function redisInit(config) {
+	var redis = new redisUtils(config.port, config.host);
+	sails.config.redis = redis.client;
 
-	var redis = require('redis');
-	var client = null;
-	try {
-		client = redis.createClient(config.port, config.host);
-	} catch (error) {
-		logger.err(error);
-	}
-	console.log(client)
-	if (client) {
-		logger.info("finish loading redis");
-	}
-	
-}
+	redis.checkIfRedisWorking(function(err){
+		if (err) {
+      return redis.warn(
+      	'\n========================================================='+
+        '\n========== redis may not be running!!! =================='+
+        '\n=========================================================');
+    }
 
-function loadMemcached(config) {
+    redis.info('redis is ready. ');
+	});
 
 }
+

@@ -10,8 +10,8 @@ function Filter(req, res){
 	this.classname = "Filter";
 
 	this.debug(req.method, req.url);
-	this.debug(req.body);
-	
+	this.debug("Body: ", req.body);
+
 };
 
 util.inherits(Filter, Class);
