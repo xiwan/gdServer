@@ -1,6 +1,5 @@
 
 var util = require('util');
-var async = require('async');
 var misc = require('../utils/MiscUtils');
 var crypt = require('../utils/CryptUtils');
 //var RedisUtils = require('../utils/RedisUtils');
@@ -9,7 +8,7 @@ var BaseService = require('./BaseService');
 module.exports = SessionService;
 
 function SessionService(res) {
-	SessionService.super_.apply(this, arguments);
+	BaseService.apply(this, arguments);
 	this.classname = "SessionService";
 }
 
@@ -36,7 +35,7 @@ SessionService.prototype.create = function(username, cb){
 		// now we have to store the sessionId and sessionToken pair into redis/db
 		// and the return the sessionId to the client side; {sid: xxxxxxx}
 		function(user, next) {
-			self.cache.set(sessionid, sessionToken, next);
+			global.cache.set(sessionid, sessionToken, next);
 		}
 	], function(err, data) {
 		if (err) {

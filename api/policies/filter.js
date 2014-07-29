@@ -3,17 +3,17 @@
 var Class = require('../utils/ClassUtils');
 var misc = require('../utils/MiscUtils');
 var util = require('util');
-var async = require('async');
+
 
 module.exports = Filter;
 
 function Filter(req, res){
 	Filter.super_.apply(this, arguments);
 	this.classname = "Filter";
-
 	this.debug(req.method, req.url);
-	this.debug("Body: ", req.body);
-
+	if (!_.isEmpty(req.body)){
+		this.debug("Body ", JSON.stringify(req.body));
+	}
 };
 
 util.inherits(Filter, Class);
@@ -25,16 +25,18 @@ Filter.prototype.isAuthed = function(req, res, cb) {
 		function(next){
 			if (sid) {
 				try {
-        	self.cache.get(sid, next);
+        	global.cache.get(sid, next);
         }catch(err) {
-        	next(err)
+        	next(self.Error("AUTH_BAD_SID"))
         };
 			}else {
 				next(self.Error("AUTH_NO_SID"));
 			}
 		},
 		function(session, next){
-			self.debug(session);
+			if (!session){
+				return next(self.Error("AUTH_BAD_SID"));
+			}
 			var sessionArr = session.split(":");
 			var len = sessionArr.length;
 			var now = misc.time();
@@ -61,10 +63,10 @@ Filter.prototype.isAuthed = function(req, res, cb) {
 				// abnormal condition;
 				next(self.Error("AUTH_BAD_SID"));
 			}
-			self.debug(_username, _world, now, _now, _expire);
 			if (now <= _now) {
 				next(self.Error("AUTH_BAD_SID"));
 			}else if (now < _expire) {
+				// could use cache here to quick gameUser;
 				User.getOneByUserAndWorld(_username, _world, next);
 			}else {
 				next(self.Error("AUTH_EXPIRED_SID"));
@@ -72,7 +74,7 @@ Filter.prototype.isAuthed = function(req, res, cb) {
 
 		},
 	], function(err, user) {
-		if (err) res.send(err, 500);
+		if (err) cb(err);
 		if (!user) {
 			return cb(self.Error("AUTH_USER_NONE"));
 		}
@@ -87,22 +89,56 @@ Filter.prototype.isAuthed = function(req, res, cb) {
 
 Filter.prototype.lang = function (req, res, cb){
 	var lang = req.param("lang");
-	if (lang) {
-		req.locale = lang;
-	}else {
-		req.locale = 'en';
-	}
+	req.locale = (lang)?lang:en;
 	cb(null, req);
 };
 
-Filter.prototype.version = function (req, res, cb) {
-	//logger.debug(req.param("v"));
-	//todo: check request version
 	// if v < db v, then go to master data downloading logic
 	// if v = db v, nothing happend,
 	// if v > db v, degrade to db v or error happens
-	cb(null, req);
+Filter.prototype.version = function (req, res, cb) {
+	var self = this;
+	var _v = 0;
+	async.waterfall([
+		function(next){
+			if (req.param && req.param('v')) {
+		      _v = _.parseInt(req.param('v'));  
+		  }
+		  next(null, _v);
+		},
+		function(_v, next){
+		  if (global.v && global.v == _v) {
+				self.info(">>> version get form cache");
+				next(null, global.v);
+			} else {
+				Config.getOne("v", function(err, result) {
+					self.info(">>> version get from db");
+					global.v = _.parseInt(result.value);
+					next(null, global.v);
+				});
+			}	
+					
+		},
+
+	], function(err, v){
+		if (v > _v) {
+			return cb(self.Error("CONFLICT_VERSION"));
+		}
+		cb(null, req);
+	});
+
 };
+
+Filter.prototype.isBanned = function(req, res, cb) {
+	if (req.gameUser) {
+		if (req.gameUser.banned){
+			cb(self.Error("USER_BANNED"));
+		}
+	}else {
+		cb(self.Error("USER_NONE"));
+	}
+	cb(null, req);
+}
 
 Filter.prototype.isUnderMaintenanceForAllUser = function (req, res, cb) {
 	// here we retrieve world status

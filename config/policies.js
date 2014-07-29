@@ -26,7 +26,7 @@ module.exports.policies = {
 
   	worldList: 'createAuthed',
   	worldChoose: 'createAuthed',
-  }
+  },
 
   /*
 	// Here's an example of adding some policies to a controller

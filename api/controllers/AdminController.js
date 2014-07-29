@@ -1,7 +1,6 @@
 
 'use strict';
 
-var async = require('async');
 var logger = require('../utils/LoggerUtils');
 
 var AdminController = {};

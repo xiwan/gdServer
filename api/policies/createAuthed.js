@@ -1,6 +1,5 @@
 'use strict';
 
-var async = require('async');
 var Filter = require('./Filter');
 
 module.exports = function(req, res, cb) {
@@ -11,16 +10,22 @@ module.exports = function(req, res, cb) {
 			filter.isUnderMaintenanceForAllUser(req, res, next);
 		},
 		// locale check, default set is 'en'
-		function(data, next) {
+		function(underMaintenance, next) {
 			filter.lang(req, res, next);
 		},
-
 		// is authed user ?
-		function(underMaintenance, next) {
-				filter.isAuthed(req, res, next);
+		function(data, next) {
+			filter.isAuthed(req, res, next);
+		},
+		function(data, next) {
+			filter.isBanned(req, res, next);
+		},
+		// master data version check
+		function(data, next) {
+				filter.version(req, res, next);
 		},
 	], function(err, data){
-		if (err) return cb(err);
+		if (err) return res.send(err);
 		cb();
 	});
 	

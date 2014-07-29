@@ -1,6 +1,5 @@
 
 var util = require('util');
-var async = require('async');
 var BaseService = require('./BaseService');
 var logger = require('../utils/LoggerUtils');
 //var log = require('../utils/LogUtils');
@@ -8,7 +7,7 @@ var logger = require('../utils/LoggerUtils');
 module.exports = GateService;
 
 function GateService(res) {
-	GateService.super_.apply(this, arguments);
+	BaseService.apply(this, arguments);
 	this.classname = "GateService";
 }
 

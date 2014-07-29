@@ -24,7 +24,6 @@
 'use strict';
 
 var fs = require('fs');
-var _ = require('lodash');
 var logger = require('../api/utils/LoggerUtils');
 var defaults = require('./env/defaults');
 

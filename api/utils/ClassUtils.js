@@ -7,26 +7,26 @@ module.exports = ClassUtils;
 
 function ClassUtils(){
 	this.classname = "Class";
-	this.cache = sails.config.cache;
+	logger.lv = global.sails.config[sails.config.environment].log.lv;
 };
 
 ClassUtils.prototype.info = function() {
-	logger.level(this.classname);
+	logger.level("info " + this.classname);
 	logger.info.apply(logger, arguments);
 };
 
 ClassUtils.prototype.debug = function() {
-	logger.level(this.classname);
+	logger.level("debug " + this.classname);
 	logger.debug.apply(logger, arguments);
 };
 
 ClassUtils.prototype.warn = function() {
-	logger.level(this.classname);
+	logger.level("warn " + this.classname);
 	logger.warn.apply(logger, arguments);
 };
 
 ClassUtils.prototype.err = function() {
-	logger.level(this.classname);
+	logger.level("err " + this.classname);
 	logger.err.apply(logger, arguments);
 };
 

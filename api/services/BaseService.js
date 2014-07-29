@@ -1,10 +1,8 @@
 'use strict';
 
 var code = require('../utils/CodeUtils');
-var logger = require('../utils/LoggerUtils');
 var Class = require('../utils/ClassUtils');
 var util = require('util');
-var _ = require('underscore');
 
 module.exports = BaseService;
 
@@ -24,8 +22,11 @@ BaseService.prototype.checkpoint = function(pre_rslt){
 	return (rslt.code == code.NORMAL) ? true: false;
 };
 
-BaseService.prototype.wrapCode = function(_code, _params){
-	return code(this.res, code[_code], _params);
+// example: wrapCode("PASSWORD_NOT_MATCHED", "password1", "password2");
+BaseService.prototype.wrapCode = function(){
+	var _code = _.toArray(arguments)[0];
+	var _params = _.toArray(arguments).slice(1);
+	return code(this.res, _code, _params);
 };
 
 

@@ -12,6 +12,7 @@ function RedisUtils(port, host, options){
 	self.classname = "RedisUtils";
 
 	self.client = redis.createClient(port, host, options);
+	//redis.debug_mode = true;
 
 	self.client.on('ready', function(details){
 		if(details)
@@ -48,7 +49,7 @@ function RedisUtils(port, host, options){
 util.inherits(RedisUtils, Class);
 
 RedisUtils.prototype.checkIfRedisWorking = function(cb) {
-	if (sails.config == undefined || sails.config.cache == undefined) {
+	if (global == undefined || global.cache == undefined) {
 		return cb("The cache object 'sails.config.cache' is not defined.");
 	}
 
@@ -56,12 +57,12 @@ RedisUtils.prototype.checkIfRedisWorking = function(cb) {
   var key = 'redisTestKey';
   var val = 'redisTestVal';
 
-  sails.config.cache.set(key, val, function(err, result){
+  global.cache.set(key, val, function(err, result){
   	if (err) {
   		return cb("Error setting test value in Redis. Please make sure it's running.");
   	}
 
-  	sails.config.cache.get(key, function(err, result){
+  	global.cache.get(key, function(err, result){
   		if (err || val !== result) {
          return cb("Error setting test value in Redis. Please make sure it's running.");
       }

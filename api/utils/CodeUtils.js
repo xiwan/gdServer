@@ -5,20 +5,23 @@ module.exports = CodeUtils;
 
 function CodeUtils(res, code, params) {
   var codeMsg = {};
-  codeMsg.code = code||CodeUtils.NORMAL;
+  codeMsg.code = CodeUtils[code]||CodeUtils.NORMAL;
   codeMsg.data = null;
   if (params){
-    codeMsg.msg = res.i18n.apply(this, array_merge([codeMsg.code], params));
+    codeMsg.msg = res.i18n.apply(this, [codeMsg.code].concat(params));
+    //codeMsg.msg = res.i18n.apply(this, array_merge([codeMsg.code], params));
   }else{
     codeMsg.msg  = res.i18n(codeMsg.code);
   }
   return codeMsg;
 }
 
-CodeUtils.Error = function(name) {
+CodeUtils.Error = function(message) {
+  // in production mode, should disable this error stack 
+  // possibly insecure
   Error.captureStackTrace(this, this);
-  this.name =name;
-  this.message = CodeUtils[name];
+  this.code = CodeUtils[message];
+  this.msg = message;
 }
 
 util.inherits(CodeUtils.Error, Error);
@@ -26,7 +29,7 @@ util.inherits(CodeUtils.Error, Error);
 /*
   ATTENTION: the suffix number identify how many parameters need to be passed.
   Thus, this how we call it:
-      var msg = msgUtils(res, msgUtils.PASSWORD_NOT_MATCHED, [password, rptpassword]);
+      var msg = CodeUtils(res, msgUtils.PASSWORD_NOT_MATCHED, [password, rptpassword]);
 */
 
 CodeUtils.PASSWORD_NOT_MATCHED = 100;
@@ -36,17 +39,21 @@ CodeUtils.USER_INVALID = 110;
 CodeUtils.USER_DUPLICATE = 111;
 CodeUtils.USER_NONE = 112;
 CodeUtils.USER_SESSION_SET_ERROR = 113;
+CodeUtils.USER_BANNED = 114;
 
 CodeUtils.WORLD_DUPLICATE = 120;
 CodeUtils.WORLD_NONE = 121;
 
 
 CodeUtils.MISS_VERSION = 1000;
-CodeUtils.SERVICE_UNAVAILABLE = 1001;
-CodeUtils.AUTH_NO_SID = 1003;
-CodeUtils.AUTH_BAD_SID= 1004;
-CodeUtils.AUTH_EXPIRED_SID = 1005;
-CodeUtils.AUTH_USER_NONE = 1006;
+CodeUtils.CONFLICT_VERSION = 1001;
+
+CodeUtils.AUTH_NO_SID = 1011;
+CodeUtils.AUTH_BAD_SID= 1012;
+CodeUtils.AUTH_EXPIRED_SID = 1013;
+CodeUtils.AUTH_USER_NONE = 1014;
+
+CodeUtils.SERVICE_UNAVAILABLE = 1015;
 
 CodeUtils.NORMAL = 200;
 CodeUtils.BAD_REQUEST = 400;
