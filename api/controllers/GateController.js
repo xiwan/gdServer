@@ -1,8 +1,6 @@
 
 'use strict';
 
-
-
 var GateController = {};
 
 // user login
