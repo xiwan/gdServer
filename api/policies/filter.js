@@ -39,7 +39,7 @@ Filter.prototype.isAuthed = function(req, res, cb) {
 			}
 			var sessionArr = session.split(":");
 			var len = sessionArr.length;
-			var now = misc.time();
+			var now = misc.now();
 
 			var _world = null;
 			var _username = null;
@@ -89,7 +89,7 @@ Filter.prototype.isAuthed = function(req, res, cb) {
 
 Filter.prototype.lang = function (req, res, cb){
 	var lang = req.param("lang");
-	req.locale = (lang)?lang:en;
+	req.locale = (lang)?lang:'en';
 	cb(null, req);
 };
 

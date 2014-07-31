@@ -54,7 +54,7 @@ SessionService.prototype.refresh = function(){
 // otherwise the format is: world:val:now:expire
 // every user/account can only have one session at the same moment;
 function _build (val) {
-	var now = misc.time();
+	var now = misc.now();
 	var expire = now + 3600;
 	return val + ":" + now + ":" + expire;
 }

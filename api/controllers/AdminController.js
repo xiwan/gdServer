@@ -1,9 +1,10 @@
 
 'use strict';
 
-var logger = require('../utils/LoggerUtils');
+var BaseController = require('./BaseController');
 
-var AdminController = {};
+var AdminController = BaseController.extend({});
+AdminController.classname = "AdminController";
 
 // list all worlds
 AdminController.worldList = function(req, res) {

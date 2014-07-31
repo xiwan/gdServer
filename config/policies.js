@@ -16,10 +16,10 @@ module.exports.policies = {
 
   // Default policy for all controllers and actions
   // (`true` allows public access) 
-  // '*': ['create'],
+  '*': false,
 
   GateController: {
-  	'*': false,
+  	
   	userLogin: 'create',
   	userCreate: 'create',
   	userWeak: 'create',

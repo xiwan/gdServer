@@ -9,6 +9,9 @@ module.exports = GateService;
 function GateService(res) {
 	BaseService.apply(this, arguments);
 	this.classname = "GateService";
+
+	this.aplphas = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890'
+
 }
 
 util.inherits(GateService, BaseService);
@@ -68,6 +71,32 @@ GateService.prototype.loginUser = function(username, password, cb) {
 
 };
 
+GateService.prototype.userWeak = function(cb) {
+	var self = this;
+
+	async.waterfall([
+		function(next){
+			var randomName = '';
+			for (var i=0; i<8; i++) {
+				var idx = _.random(0, 61);
+				randomName += self.aplphas.substr(idx, 1);
+			}
+			next(null, randomName);
+		},
+		function(randomName, next){
+			//self.createUser(randomName, null, '1111111', '111111', next);
+			User.createOne(randomName, null, '12345678', next);
+		}
+	], function(err, user){
+		if (err) return cb(err);
+		if (user){
+			self.rslt.data = user;
+		}
+		cb(null, self.rslt);
+	});
+
+};
+
 GateService.prototype.listWorld = function(cb) {
 	var self = this;
 
@@ -110,3 +139,5 @@ GateService.prototype.createWorld = function(name, port, cap, cb) {
 		cb(null, self.rslt);
 	});
 };
+
+

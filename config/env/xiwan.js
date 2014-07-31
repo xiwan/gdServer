@@ -6,12 +6,8 @@ module.exports = {
 	// all logined user will be kicked out at ur own risk;
 	salt: '8f714e367ceecbcd77e6349f9c3cbc96',
 
-	log: {
-		lv: 'info',
-		path: '', // to do
-	},
-
 	env: {
+		name: 'localhost',
 		port: 8080,		
 	},
 

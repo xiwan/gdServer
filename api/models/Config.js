@@ -1,29 +1,13 @@
+'use strict';
 
+var BaseModel = require('./BaseModel');
 
-var Config = {
-	autoCreateAt: false,
-
-	attributes: {
-		key: {
-			type: 'string',
-			maxLength: 32,
-  		minLength: 4,
-  		required: true,
-		},
-		value: {
-			type: 'string',
-			maxLength: 128,
-  		required: true,
-		},
-
-  	toJSON: function(){
-			var obj = this.toObject();
-			delete obj.id;
-			return obj;
-		},
-	},
-
+var _fields = {
+		key: { type: 'string', maxLength: 32, minLength: 4, required: true, },
+		value: { type: 'string', maxLength: 128, required: true, },
 };
+
+var Config = BaseModel.extend(_fields);
 
 Config.getOne = function(key, cb){
 	this

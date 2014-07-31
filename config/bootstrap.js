@@ -10,6 +10,8 @@
 
 var redisUtils = require('../api/utils/RedisUtils');
 
+//var World = require('../api/models/World');
+
 module.exports.bootstrap = function (cb) {
 
   // It's very important to trigger this callack method when you are finished 
@@ -27,8 +29,35 @@ module.exports.bootstrap = function (cb) {
   }else {
   	sails.log.warn("no cache found!");
   }
-  cb();
+
+  registerWorld(cb);
 };
+
+function registerWorld(cb){
+  var _name = sails.config[process.env.NODE_ENV].env.name;
+  var _port = sails.config[process.env.NODE_ENV].env.port;
+  var _cap = sails.config[process.env.NODE_ENV].env.cap;
+
+  async.waterfall([
+    function(next){
+      World.getOne(_port, next);
+    },
+    function(world, next){
+      if (world) {
+        if (world.name != _name) {
+          World.updateByPort({name: _name}, _port, next);
+        }else {
+          next(null, world);
+        }
+      }else {
+        World.createOne(_name, _port, _cap, next);
+      }
+    }
+  ], function (err, world) {
+    if(err) return cb(err);
+    cb();
+  });
+}
 
 
 function globalInit(){

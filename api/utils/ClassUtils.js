@@ -5,28 +5,27 @@ var code = require('../utils/CodeUtils');
 
 module.exports = ClassUtils;
 
-function ClassUtils(){
-	this.classname = "Class";
-	logger.lv = global.sails.config[sails.config.environment].log.lv;
+function ClassUtils(classname){
+	this.classname = classname||"Class";
 };
 
 ClassUtils.prototype.info = function() {
-	logger.level("info " + this.classname);
+	logger.level(this.classname + " info");
 	logger.info.apply(logger, arguments);
 };
 
 ClassUtils.prototype.debug = function() {
-	logger.level("debug " + this.classname);
+	logger.level(this.classname + " debug");
 	logger.debug.apply(logger, arguments);
 };
 
 ClassUtils.prototype.warn = function() {
-	logger.level("warn " + this.classname);
+	logger.level(this.classname + " warn");
 	logger.warn.apply(logger, arguments);
 };
 
 ClassUtils.prototype.err = function() {
-	logger.level("err " + this.classname);
+	logger.level(this.classname + " err");
 	logger.err.apply(logger, arguments);
 };
 

@@ -61,7 +61,16 @@
 	});
 
 	$("#weakBtn").click(function(){
-		alert(2)
+		$.ajax({
+			type: 'POST',
+			url: '/gate/user/weak',
+			success: function (data){
+				alert('ok: '+ data.code);
+			},
+			error: function(data){
+				alert('error: '+ data);
+			}
+		});
 		
 	});
 

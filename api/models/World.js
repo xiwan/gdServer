@@ -1,72 +1,52 @@
 'use strict';
 
-var logger =require('../utils/LoggerUtils');
+var misc = require('../utils/MiscUtils');
+var BaseModel = require('./BaseModel');
 
-var World = {
+var _fields = {
+  name: { type: 'string', minLength: 4, maxLength: 32, required: true, },
+  ipAddr: { type: 'ipv4' },
+  port: { type: 'integer', required: true, },
+  delay: { type: 'integer', defaultsTo: 0, },
+  population: { type: 'integer', defaultsTo: 0, },
+  capacity: { type: 'integer', required: true, },
+  disabled: { type: 'boolean', defaultsTo: true },
+  entryLevel: { type: 'integer', defaultsTo: 0, },
+};
 
-  attributes: {
-  	name: {
-  		type: 'string',
-  		minLength: 4,
-      maxLength: 32,
-  		required: true,
-  	},
-  	ipAddr: {
-  		type: 'ipv4'
-  	},
-  	port: {
-  		type: 'integer',
-  		required: true,
-  	},
-  	delay: {
-  		type: 'integer',
-  		defaultsTo: 0,
-  	},
-  	population: {
-  		type: 'integer',
-  		defaultsTo: 0,
-  	},
-  	capacity: {
-  		type: 'integer',
-  		required: true,
-  	},
-  	disabled: 'boolean',
-  	entryLevel: {
-  		type: 'integer',
-  		defaultsTo: 0,
-  	},
+var World = BaseModel.extend(_fields);
+World.classname = "World";
 
-		toJSON: function(){
-			var obj = this.toObject();
-			delete obj.id;
-			return obj;
-		}
-  },
-
-  beforeCreate: function(values, next) {
-  	if (values.name == null || values.port == null || values.capacity == null) {
-  		next(new Error("Config structure is invalid"));
-  	}else {
-  		next();
-  	}
-	},
-
+// Lifecycle callback
+World.beforeCreate =  function(values, next) {
+  console.log(values)
+	if (values.name == null || values.port == null || values.capacity == null) {
+		next(new Error("Config structure is invalid"));
+	}else {
+    var now = misc.now();
+    values.createdAt = now;
+    values.updatedAt = now;
+		next();
+	}
 };
 
 // find all worlds
 World.getAll = function(cb){
 	this
 		.find()
-		.exec(function(err, data){
-			cb(err, data);
+		.exec(function(err, world){     
+			cb(err, world);
 		});
 };
 
 World.getOne = function(port, cb) {
 	this
 		.findOneByPort(port)
-		.exec(function(err, data){
-			cb(err, data);
+		.exec(function(err, world){
+      if (world){
+        world = world.toJSON();
+      }
+			cb(err, world);
 		});
 };
 
@@ -78,7 +58,7 @@ World.createOne = function(name, port, cap, cb) {
 		port: port,
 		delay: 0,
 		population: 0,
-		capacity: cap,
+		capacity: cap||5000,
 		disabled: true,
 		entryLevel: 0
 	};
@@ -89,8 +69,22 @@ World.createOne = function(name, port, cap, cb) {
 			cb(err, data);
 		});
 
-}
+};
 
-
+World.updateByPort = function(update, port, cb) {
+  this
+    .findOneByPort(port)
+    .then(function(world){
+      if (update.name) {
+        world.name = update.name;
+      }
+      world.updatedAt = misc.now();
+      world.save(function(err){
+        cb(err, world);
+      });
+    });  
+};
 
 module.exports = World;
+
+

@@ -1,7 +1,10 @@
 
 'use strict';
 
-var GateController = {};
+var BaseController = require('./BaseController');
+
+var GateController = BaseController.extend({});
+GateController.classname = "GateController";
 
 // user login
 GateController.userLogin = function(req, res) {
@@ -48,8 +51,18 @@ GateController.userCreate = function(req, res) {
 	});
 };
 
+// weak account fast playing
 GateController.userWeak = function(req, res) {
+	var gateService = new GateService(res);
 
+	async.waterfall([
+		function(next){
+			gateService.userWeak(next);
+		},
+	], function(err, rslt){
+		if (err) return res.send(err, 500);
+		res.json(rslt);
+	});
 };
 
 // list all worlds

@@ -1,100 +1,55 @@
-/**
- * User
- *
- * @module      :: Model
- * @description :: A short summary of how this model works and what it represents.
- * @docs		:: http://sailsjs.org/#!documentation/models
- */
+'use strict';
 
 var crypt = require('../utils/CryptUtils');
 var misc = require('../utils/MiscUtils');
+var BaseModel = require('./BaseModel');
 
-var User = {
+var _fields = {
+  username: { type: 'string', maxLength: 32, minLength: 4, required: true, },
+  sid: { type: 'string', maxLength: 32, defaultsTo: 'unkown', },
+  password: { type: 'string', maxLength: 32, minLength: 8, required: true, },
+  phoneNumber: { type: 'string', required: true, },
+  world: { type: 'string', minLength: 4, maxLength: 32, defaultsTo: 'unkown', },
+  ipAddr: { type: 'string', defaultsTo: '127.0.0.1', },
+  city: { type: 'string', defaultsTo: 'unkown', },
+  country: { type: 'string', defaultsTo: 'unkown', },
+  banned: { type: 'boolean', defaultsTo: false, },
+  lastLoginWorld: { type: 'string', defaultsTo: 'unkown', },
+  lastLoginAt: 'integer',
 
-	autoCreatedAt: false, 
-
-  attributes: {
-  	username: {
-  		type: 'string',
-  		maxLength: 32,
-  		minLength: 4,
-  		required: true,
-  	},
-    sid: {
-      type: 'string',
-      maxLength: 32,
-      defaultsTo: 'unkown',
-    },
-  	password: {
-  		type: 'string',
-  		maxLength: 32,
-  		minLength: 8,
-  		required: true,
-  	},
-  	phoneNumber: {
-  		type: 'string',
-  		defaultsTo: '111-222-333',
-  		required: true,
-  	},
-    world: {
-      type: 'string',
-      minLength: 4,
-      maxLength: 32,
-      defaultsTo: 'unkown',
-    },
-  	ipAddr: {
-  		type: 'string',
-  		defaultsTo: '127.0.0.1',
-  	},
-  	city: {
-  		type: 'string',
-  		defaultsTo: 'unkown',
-  	},
-  	country: {
-  		type: 'string',
-  		defaultsTo: 'unkown',
-  	},
-  	lastLoginAt: 'datetime',
-  	lastLoginWorld: {
-  		type: 'string',
-  		defaultsTo: 'unkown',
-  	},
-  	banned: {
-  		type: 'boolean',
-  		defaultsTo: false,
-  	},
-  	createdAt: 'datetime',
-  	updatedAt: 'datetime',
-
-  	toJSON: function(){
-			var obj = this.toObject();
-			delete obj.id;
-			delete obj.password;
-			return obj;
-		},
-
+  toJSON: function(){
+    var obj = this.toObject();
+    delete obj.id;
+    delete obj.password;
+    return obj;
   },
+};
 
-  beforeCreate: function(values, next){
-  	crypt.md5(values.password, null, function(err, hash){
-  		if(err) return next(err);
-  		var now = new Date();
-	  	values.lastLoginAt = now;
-	  	values.createdAt = now;
-	  	values.updatedAt = now;
-	  	values.password = hash;
-	  	next();
-  	});
-  }
+var User = BaseModel.extend(_fields);
+User.classname = "User";
 
+// Lifecycle callback
+User.beforeCreate = function(values, next){
+  crypt.md5(values.password, null, function(err, hash){
+    User.debug(hash);
+    if(err) return next(err);
+    var now = misc.now();
+    values.lastLoginAt = now;
+    values.createdAt = now;
+    values.updatedAt = now;
+    values.password = hash;
+    next();
+  });
 };
 
 User.createOne = function(username, phoneNumber, password, cb) {
+  this.debug(username, phoneNumber, password);
 	this
 		.create({
       username: username,
-      phoneNumber: phoneNumber,
-      password: password
+      phoneNumber: phoneNumber || '111-222-333',
+      password: password,
+      banned: false,
     })
 		.done(function(err, user){
 			if(err) return cb(err);

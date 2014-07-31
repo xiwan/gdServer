@@ -17,28 +17,32 @@ LoggerUtils.level = function(level) {
 };
 
 LoggerUtils.info = function(){
-	if (arguments && (this.lv == 'info')){
+	var _lv = this.lv.toLowerCase();
+	if (arguments && (_lv == 'info')){
 		logger.format(':level.green :msg.grey');
 		logger.info.apply(this, arguments);
 	}	
 };
 
 LoggerUtils.debug = function(){
-	if (arguments && (this.lv == 'info' || this.lv == 'debug')){
+	var _lv = this.lv.toLowerCase();
+	if (arguments && (_lv == 'info' || _lv == 'debug')){
 		logger.format(':level.blue :msg.grey');
 		logger.debug.apply(this, arguments);
 	}	
 };
 
 LoggerUtils.warn = function(){
-	if (arguments && (this.lv == 'info' || this.lv == 'debug' || this.lv = 'warn')){
+	var _lv = this.lv.toLowerCase();
+	if (arguments && (_lv == 'info' || _lv == 'debug' || _lv =='warn')){
 		logger.format(':level.yellow :msg.grey');
 		logger.warn.apply(this, arguments);
 	}
 };
 
 LoggerUtils.err = function(){
-	if (arguments && (this.lv == 'info' || this.lv == 'debug' || this.lv = 'warn' || this.lv == 'err')){
+	var _lv = this.lv.toLowerCase();
+	if (arguments && (_lv == 'info' || _lv == 'debug' || _lv == 'warn' || _lv == 'err')){	
 		logger.format(':level.red :msg.grey');
 		logger.err.apply(this, arguments);
 	}
