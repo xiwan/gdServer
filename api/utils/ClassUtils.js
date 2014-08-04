@@ -11,22 +11,22 @@ function ClassUtils(classname){
 
 ClassUtils.prototype.info = function() {
 	logger.level(this.classname + " info");
-	logger.info.apply(logger, arguments);
+	logger.info.apply(logger, arguments);		
 };
 
 ClassUtils.prototype.debug = function() {
 	logger.level(this.classname + " debug");
-	logger.debug.apply(logger, arguments);
+	logger.debug.apply(logger, arguments);		
 };
 
 ClassUtils.prototype.warn = function() {
 	logger.level(this.classname + " warn");
-	logger.warn.apply(logger, arguments);
+	logger.warn.apply(logger, arguments);		
 };
 
 ClassUtils.prototype.err = function() {
 	logger.level(this.classname + " err");
-	logger.err.apply(logger, arguments);
+	logger.err.apply(logger, arguments);		
 };
 
 ClassUtils.prototype.Error = function(name){

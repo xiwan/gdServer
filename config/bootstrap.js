@@ -40,7 +40,7 @@ function registerWorld(cb){
   
   async.waterfall([
     function(next){
-      World.getOne(_port, next);
+      World.getOne(null, _port, next);
     },
     function(world, next){
       if (world) {

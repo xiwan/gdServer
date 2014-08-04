@@ -23,8 +23,8 @@ AdminController.worldList = function(req, res) {
 AdminController.worldCreate = function(req, res){
 
 	var name = req.param('name');
-	var port = parseInt(req.param('port'));
-	var cap = parseInt(req.param('cap'));
+	var port = _.parseInt(req.param('port'));
+	var cap = _.parseInt(req.param('cap'));
 	
 	self.waterfall([
 		function (next) {

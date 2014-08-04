@@ -20,7 +20,7 @@ var self = World;
 // Lifecycle callback
 World.beforeCreate =  function(values, next) {
 	if (values.name == null || values.port == null || values.capacity == null) {
-		next(this.Error("WORLD_CREATE_FAIL"));
+		next("WORLD_CREATE_FAIL");
 	}else {
     var now = misc.now();
     values.createdAt = now;
@@ -38,14 +38,21 @@ World.getAll = function(cb){
 		});
 };
 
-World.getOne = function(port, cb) {
+World.getOne = function(name, port, cb) {
+	var where = {};
+	if (name)
+		where.name = name;
+	if (port)
+		where.port = port;
+
 	this
-		.findOneByPort(port)
+		.findOne(where)
 		.exec(function(err, world){
+			if (err) return cb(err);
       if (world){
         world = world.toJSON();
       }
-			cb(err, world);
+			cb(null, world);
 		});
 };
 
@@ -76,6 +83,9 @@ World.updateByPort = function(update, port, cb) {
     .then(function(world){
       if (update.name) {
         world.name = update.name;
+      }
+      if (update.popIncr) {
+        world.population += update.popIncr;
       }
       world.updatedAt = misc.now();
       world.save(function(err){

@@ -13,7 +13,6 @@ module.exports = (function(){
 			Class.apply(this, arguments);
 			this.classname = classname||"BaseController";
 			this._config = {};
-			console.log(this)
 		}
 
 		util.inherits(_BaseController, Class);

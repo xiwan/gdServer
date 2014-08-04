@@ -52,7 +52,7 @@ User.createOne = function(username, phoneNumber, password, cb) {
     })
 		.done(function(err, user){
 			if(err) return cb(err);
-			cb(err, user);
+			cb(null, user);
 		});
 };
 
@@ -61,11 +61,24 @@ User.updateSid = function(username, sid, cb) {
     .findOneByUsername(username)
     .then(function(user){
       user.sid = sid;
+      user.updatedAt = misc.now();
       user.save(function(err){
         cb(err, user);
       });
     });
 };
+
+User.updateWorld = function(username, worldname, cb) {
+  this
+    .findOneByUsername(username)
+    .then(function(user){
+      user.lastLoginWorld = worldname;
+      user.updatedAt = misc.now();
+      user.save(function(err){
+        cb(err, user);
+      });
+    });
+}
 
 User.getOne = function(username, cb){
   this
@@ -76,32 +89,37 @@ User.getOne = function(username, cb){
       if (user){
         user = user.toJSON();
       }
-      cb(err, user);
+      cb(null, user);
     });
 };
 
 User.getOneByUserAndPass = function(username, password, cb) {
-  var self = this;
-  crypt.md5(password, null, function(err, hash){
-    if(err) return next(err);
-    self
-      .findOne()
-      .where({username: username})
-      .where({password: hash})
-      .done(function(err, user){
-        if(err) return cb(err);
-        if (user){
-          user = user.toJSON();
-        }
-        cb(err, user);
-      });
+  var that = this;
+  self.waterfall([
+    function(next){
+      crypt.md5(password, null, next);
+    },
+    function(hash, next) {
+      that
+        .findOne()
+        .where({username: username, password: hash})
+        .done(next);
+    }
+  ], function(err, user) {
+    if(err) return cb(err);
+    if (user){
+      user = user.toJSON();
+    }
+    cb(null, user);
   });
+
 };
 
 User.getOneByUserAndWorld = function(username, worldname, cb) {
   var where = {username: username};
-  if (worldname)
-    where.world = worldname;
+  if (worldname){
+    where.lastLoginWorld = worldname;
+  }
 
   this
     .findOne()

@@ -5,13 +5,19 @@ module.exports = CodeUtils;
 
 function CodeUtils(res, code, params) {
   var codeMsg = {};
+  if (code instanceof Error){
+    codeMsg.code = CodeUtils.ERROR_INTERNAL;
+    codeMsg.message = "ERROR_INTERNAL";
+    return codeMsg;
+  }
+
   codeMsg.code = CodeUtils[code]||CodeUtils.NORMAL;
-  codeMsg.data = null;
+  //codeMsg.data = null;
   if (params){
-    codeMsg.msg = res.i18n.apply(this, [codeMsg.code].concat(params));
+    codeMsg.message = res.i18n.apply(this, [codeMsg.code].concat(params));
     //codeMsg.msg = res.i18n.apply(this, array_merge([codeMsg.code], params));
   }else{
-    codeMsg.msg  = res.i18n(codeMsg.code);
+    codeMsg.message  = res.i18n(codeMsg.code);
   }
   return codeMsg;
 }
@@ -44,6 +50,7 @@ CodeUtils.USER_BANNED = 114;
 CodeUtils.WORLD_DUPLICATE = 120;
 CodeUtils.WORLD_NONE = 121;
 CodeUtils.WORLD_CREATE_FAIL = 122;
+CodeUtils.WORLD_POPULATION_BOOM = 123;
 
 CodeUtils.MISS_VERSION = 1000;
 CodeUtils.CONFLICT_VERSION = 1001;

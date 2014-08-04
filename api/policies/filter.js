@@ -7,8 +7,7 @@ var code = require('../utils/CodeUtils');
 //var util = require('util');
 
 
-var Filter = new Class();
-Filter.classname = "Filter";
+var Filter = new Class("Filter");
 
 var self = Filter;
 
@@ -35,26 +34,20 @@ Filter.extendResponse = function(req, res, cb) {
 		var _params = _.toArray(arguments).slice(2);
 
 		var response = code(res, _code, _params);
-		if (_data){
+		if (!_.isEmpty(_data)){
 			response.data = _data;
 		}
-			
-		this.json(response);
+
+		if (response.code == 400 || response.code == 403 || response.code == 404 || response.code == 500) {
+			return this.send(response, response.code);
+		} 
+
+		return this.json(response);
 	};
 
 	cb(null, res);
 };
 
-// function Filter(req, res){
-// 	Filter.super_.apply(this, arguments);
-// 	this.classname = "Filter";
-// 	this.debug(req.method, req.url);
-// 	if (!_.isEmpty(req.body)){
-// 		this.debug("Body ", JSON.stringify(req.body));
-// 	}
-// };
-
-// util.inherits(Filter, Class);
 
 Filter.isAuthed = function(req, res, cb) {
 	
@@ -65,16 +58,17 @@ Filter.isAuthed = function(req, res, cb) {
 				try {
         	global.cache.get(sid, next);
         }catch(err) {
-        	next(self.Error("AUTH_BAD_SID"))
+        	next("AUTH_BAD_SID")
         };
 			}else {
-				next(self.Error("AUTH_NO_SID"));
+				next("AUTH_NO_SID");
 			}
 		},
 		function(session, next){
 			if (!session){
-				return next(self.Error("AUTH_BAD_SID"));
+				return next("AUTH_BAD_SID");
 			}
+			self.info(">>> session: ", session);
 			var sessionArr = session.split(":");
 			var len = sessionArr.length;
 			var now = misc.now();
@@ -99,25 +93,26 @@ Filter.isAuthed = function(req, res, cb) {
 
 			}else {
 				// abnormal condition;
-				next(self.Error("AUTH_BAD_SID"));
+				next("AUTH_BAD_SID");
 			}
+
 			if (now <= _now) {
-				next(self.Error("AUTH_BAD_SID"));
+				next("AUTH_BAD_SID");
 			}else if (now < _expire) {
 				// could use cache here to quick gameUser;
 				User.getOneByUserAndWorld(_username, _world, next);
 			}else {
-				next(self.Error("AUTH_EXPIRED_SID"));
+				next("AUTH_EXPIRED_SID");
 			}
 
 		},
 	], function(err, user) {
 		if (err) cb(err);
 		if (!user) {
-			return cb(self.Error("AUTH_USER_NONE"));
+			return cb("AUTH_USER_NONE");
 		}
 		if (user.sid != sid) {
-			return cb(self.Error("AUTH_BAD_SID"));
+			return cb("AUTH_BAD_SID");
 		}
 		req.gameUser = user;
 		cb(null, req);
@@ -140,8 +135,10 @@ Filter.version = function (req, res, cb) {
 		function(next){
 			if (req.param && req.param('v')) {
 		      _v = _.parseInt(req.param('v'));  
+		      next(null, _v);
+		  }else {
+		  	next("MISS_VERSION");
 		  }
-		  next(null, _v);
 		},
 		function(_v, next){
 		  if (global.v && global.v == _v) {
@@ -159,7 +156,7 @@ Filter.version = function (req, res, cb) {
 
 	], function(err, v){
 		if (v > _v) {
-			return cb(self.Error("CONFLICT_VERSION"));
+			return cb("CONFLICT_VERSION");
 		}
 		cb(null, req);
 	});
@@ -169,10 +166,10 @@ Filter.version = function (req, res, cb) {
 Filter.isBanned = function(req, res, cb) {
 	if (req.gameUser) {
 		if (req.gameUser.banned){
-			cb(self.Error("USER_BANNED"));
+			cb("USER_BANNED");
 		}
 	}else {
-		cb(self.Error("USER_NONE"));
+		cb("USER_NONE");
 	}
 	cb(null, req);
 };
@@ -183,7 +180,7 @@ Filter.isUnderMaintenanceForAllUser = function (req, res, cb) {
 		isUnderMaintenance: false,
 	};
 	if (maintenance.isUnderMaintenance) {
-		cb(this.Error("SERVICE_UNAVAILABLE"), req);
+		cb("SERVICE_UNAVAILABLE");
 	}else {
 		cb(null, req);
 	}

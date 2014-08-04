@@ -2,11 +2,27 @@
 	"100": "password '%s' not matched rptpassword '%s'.",
 	"101": "password is invalid'.",
 
+	"110": "user invalid.",
 	"111": "duplicated username.",
 	"112": "not existed username or wrong password.",
+	"113": "user session set error.",
+	"114": "user banned.",
+
+	"120": "duplicated world name.",
+	"121": "world not exist.",
+	"122": "create world failure.",
+
+	"1000": "miss version in request.",
+	"1001": "conflict version.",
+
+	"1011": "no sid found.",
+	"1012": "bad sid.",
+	"1013": "sid expired.",
+	"1014": "no sid user found.",
+
+	"1015": "service unavailable.",
 	
 	"200": "ok",
-
 	"400": "bad request",
 	"403": "forbidden",
 	"404": "not found",

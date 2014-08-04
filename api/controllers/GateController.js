@@ -20,9 +20,7 @@ GateController.userLogin = function(req, res) {
 			SessionService.create(username, next);
 		}
 	}, function(err, _data){
-		if (err){
-			return res.pack(null, err);
-		} 
+		if (err) return res.pack(null, err); 
 		res.pack(_data);
 	});
 
@@ -73,6 +71,22 @@ GateController.worldList = function(req, res) {
 };
 
 GateController.worldChoose = function(req, res) {
+	var sid = req.param('sid');
+	var worldname = req.param('name');
+	var port = _.parseInt(req.param('port'));
+	var username = req.gameUser.username;
+
+	self.series({
+		choose: function(next){
+			GateService.chooseWorld(username, worldname, port, next);
+		},
+		session: function(next){
+			SessionService.refresh(sid, username, worldname, next);
+		},
+	}, function(err, _data){
+		if (err) return res.pack(null, err);
+		res.pack(_data);		
+	});
 
 };
 

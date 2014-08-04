@@ -2,19 +2,17 @@
 var util = require('util');
 var BaseService = require('./BaseService');
 
-
 var GateService = BaseService.extend("GateService");
 var self = GateService;
 
-GateService.aplphas = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
+self.aplphas = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
 
-GateService.createUser = function(req, username, phoneNumber, password, rptpassword, cb) {
-	
+GateService.createUser = function(username, phoneNumber, password, rptpassword, cb) {
 	if (password != rptpassword) {
 		return cb("PASSWORD_NOT_MATCHED");
 	}
 
-	this.waterfall([
+	self.waterfall([
 		function (next){
 			User.getOne(username, next);
 		},
@@ -34,7 +32,7 @@ GateService.createUser = function(req, username, phoneNumber, password, rptpassw
 
 GateService.loginUser = function(username, password, cb) {
 
-	this.waterfall([
+	self.waterfall([
 		function(next){
 			User.getOneByUserAndPass(username, password, next);
 		},
@@ -53,12 +51,13 @@ GateService.loginUser = function(username, password, cb) {
 };
 
 GateService.userWeak = function(cb) {
-	this.waterfall([
+
+	self.waterfall([
 		function(next){
 			var randomName = '';
 			for (var i=0; i<8; i++) {
 				var idx = _.random(0, 61);
-				randomName += this.aplphas.substr(idx, 1);
+				randomName += self.aplphas.substr(idx, 1);
 			}
 			User.createOne(randomName, null, null, next);
 		},
@@ -69,9 +68,45 @@ GateService.userWeak = function(cb) {
 
 };
 
+GateService.chooseWorld = function(username, worldname, port, cb){
+	
+	self.series({
+		check: function(next){
+			World.getOne(worldname, port, next);
+		},
+		choose: function(next, _data){
+			if (_.isEmpty(_data.check)) {
+				next("WORLD_NONE");
+			}else {
+				if(_data.check.population > _data.check.capacity){
+					next("WORLD_POPULATION_BOOM");
+				}else {
+					_chooseWorld(username, worldname, port, next);
+					//User.updateWorld(username, worldname, next);
+				}
+			}
+		}
+
+	}, function(err, _data){
+		if (err) return cb(err);
+		cb(null, _data);
+	});
+};
+
+function _chooseWorld (username, worldname, port, cb){
+	self.parallel({
+		updateUser: function(next){
+			User.updateWorld(username, worldname, next);
+		},
+		updateWorld: function(next) {
+			World.updateByPort({popIncr: 1}, port, next);
+		},
+	}, cb);
+};
+
 GateService.listWorld = function(cb) {
 
-	this.waterfall([
+	self.waterfall([
 		function(next){
 			World.getAll(next);
 		},
@@ -87,9 +122,9 @@ GateService.listWorld = function(cb) {
 GateService.createWorld = function(name, port, cap, cb) {
 
 	var rslt = {};
-	async.waterfall([
+	self.waterfall([
 		function(next){
-			World.getOne(port, next);
+			World.getOne(null, port, next);
 		}, 
 		function(world, next) {
 			if (world) {
