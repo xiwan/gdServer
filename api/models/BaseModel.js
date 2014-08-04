@@ -8,34 +8,35 @@ module.exports = (function(){
 
 	var BaseModel = {};
 
-	BaseModel.extend = function(attributes){
-		var _BaseModel = new Class();
+	BaseModel.extend = function(attributes, classname){
 
-		_BaseModel.classname = "BaseModel";
-		_BaseModel.autoCreatedAt = false;
-		_BaseModel.autoUpdatedAt = false;
+		function _BaseModel(){
+			Class.apply(this, arguments);
+			this.classname = classname||"BaseModel";
+			this.autoCreatedAt = false;
+			this.autoUpdatedAt = false;
+			this.attributes = {
+				createdAt: 'integer',
+			  updatedAt: 'integer',	
 
-		_BaseModel.attributes = {
-			createdAt: 'integer',
-		  updatedAt: 'integer',	
+			  toJSON: function(){
+			    var obj = this.toObject();
+			    delete obj.id;
+			    return obj;
+			  },	
+			};
+		}
 
-		  toJSON: function(){
-		    var obj = this.toObject();
-		    delete obj.id;
-		    return obj;
-		  },	
-		};
-
-		// instance function binded to static function
-		_BaseModel.info = _BaseModel.info;
-		_BaseModel.debug = _BaseModel.debug;
-		_BaseModel.warn = _BaseModel.warn;
-		_BaseModel.err = _BaseModel.err;
-
+		util.inherits(_BaseModel, Class);
+		
 		// attributes merge
-		_.extend(_BaseModel.attributes, attributes);
+		var _BaseModel_ = new _BaseModel();
+		if (attributes){
+			_.extend(_BaseModel_.attributes, attributes);
+		}
+
 		// _.clone(_BaseModel, true)
-		return _BaseModel;
+		return _BaseModel_;
 	}
 
 	return BaseModel;

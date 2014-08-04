@@ -3,38 +3,36 @@
 
 var BaseController = require('./BaseController');
 
-var AdminController = BaseController.extend({});
-AdminController.classname = "AdminController";
+var AdminController = BaseController.extend("AdminController");
+var self = AdminController;
 
 // list all worlds
 AdminController.worldList = function(req, res) {
-	var gateService = new GateService(res);
 	
-	async.waterfall([
+	self.waterfall([
 		function (next) {
-			gateService.listWorld(next);
+			GateService.listWorld(next);
 		},
-	], function(err, rslt){
-		if (err) return res.send(err, 500);
-		res.json(rslt);
+	], function(err, _data){
+		if (err) return res.pack(null, err);
+		res.pack(_data);
 	});
 }
 
 // create world
 AdminController.worldCreate = function(req, res){
-	var gateService = new GateService(res);
 
 	var name = req.param('name');
 	var port = parseInt(req.param('port'));
 	var cap = parseInt(req.param('cap'));
 	
-	async.waterfall([
+	self.waterfall([
 		function (next) {
-			gateService.createWorld(name, port, cap, next)
+			GateService.createWorld(name, port, cap, next)
 		},
-	], function(err, rslt){
-		if (err) return res.send(err, 500);
-		res.json(rslt);
+	], function(err, _data){
+		if (err) return res.pack(null, err);
+		res.pack(_data);
 	});
 }
 

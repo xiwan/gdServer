@@ -1,26 +1,24 @@
 'use strict';
 
 var Class = require('../utils/ClassUtils');
+var _ = require('lodash');
+var util = require('util');
 
 module.exports = (function(){
 	var BaseController = {};
 
-	BaseController.extend = function(_config){
-		var _BaseController = new Class();
+	BaseController.extend = function(classname){
 
-		_BaseController.classname = "BaseController";
-		_BaseController._config = {};
+		function _BaseController() {
+			Class.apply(this, arguments);
+			this.classname = classname||"BaseController";
+			this._config = {};
+			console.log(this)
+		}
 
-		// _config merge
-		//_.extend(_BaseModel._config, _config);
+		util.inherits(_BaseController, Class);
 
-		// instance function binded to static function
-		_BaseController.info = _BaseController.info;
-		_BaseController.debug = _BaseController.debug;
-		_BaseController.warn = _BaseController.warn;
-		_BaseController.err = _BaseController.err;
-
-		return _BaseController;
+		return new _BaseController();
 	}
 
 	return BaseController;

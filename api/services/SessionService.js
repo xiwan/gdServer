@@ -5,17 +5,18 @@ var crypt = require('../utils/CryptUtils');
 //var RedisUtils = require('../utils/RedisUtils');
 var BaseService = require('./BaseService');
 
-module.exports = SessionService;
+var SessionService = BaseService.extend("SessionService");
 
-function SessionService(res) {
-	BaseService.apply(this, arguments);
-	this.classname = "SessionService";
-}
+var self = SessionService;
+// function SessionService(res) {
+// 	BaseService.apply(this, arguments);
+// 	this.classname = "SessionService";
+// }
 
-util.inherits(SessionService, BaseService);
+// util.inherits(SessionService, BaseService);
 
-SessionService.prototype.create = function(username, cb){
-	var self = this;
+SessionService.create = function(username, cb){
+
 	var sessionToken;
 	var sessionid;
 
@@ -41,12 +42,11 @@ SessionService.prototype.create = function(username, cb){
 		if (err) {
 				return cb(self.Error("USER_SESSION_SET_ERROR"));
 		}
-		self.rslt.data = {sid: sessionid};
-		cb(null, self.rslt);
+		cb(null, {sid: sessionid});
 	});
 }
 
-SessionService.prototype.refresh = function(){
+SessionService.refresh = function(){
 
 }
 
@@ -63,3 +63,5 @@ function _parse(sessionToken) {
 
 
 }
+
+module.exports = SessionService;

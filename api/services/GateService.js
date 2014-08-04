@@ -1,55 +1,40 @@
 
 var util = require('util');
 var BaseService = require('./BaseService');
-var logger = require('../utils/LoggerUtils');
-//var log = require('../utils/LogUtils');
 
-module.exports = GateService;
 
-function GateService(res) {
-	BaseService.apply(this, arguments);
-	this.classname = "GateService";
+var GateService = BaseService.extend("GateService");
+var self = GateService;
 
-	this.aplphas = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890'
+GateService.aplphas = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
 
-}
-
-util.inherits(GateService, BaseService);
-
-GateService.prototype.createUser = function(username, phoneNumber, password, rptpassword, cb) {
-	var self = this;
+GateService.createUser = function(req, username, phoneNumber, password, rptpassword, cb) {
 	
 	if (password != rptpassword) {
-		self.rslt = self.wrapCode("PASSWORD_NOT_MATCHED");
-		return cb(null, this.rslt);
+		return cb("PASSWORD_NOT_MATCHED");
 	}
 
-	async.waterfall([
+	this.waterfall([
 		function (next){
 			User.getOne(username, next);
 		},
 		function (user, next){
 			if (user) {
-				self.rslt = self.wrapCode("USER_DUPLICATE");
-				next(null, user);
+				next("USER_DUPLICATE");
 			}else{
 				User.createOne(username, phoneNumber, password, next);
 			}
 		}
-	], function(err, user){
+	], function(err, data){
 		if(err) return cb(err);
-		if (user) {
-			self.rslt.data = user;
-		}
-		cb(null, self.rslt);
+		cb(null, data);
 	});
 
 };
 
-GateService.prototype.loginUser = function(username, password, cb) {
-	var self = this;
+GateService.loginUser = function(username, password, cb) {
 
-	async.waterfall([
+	this.waterfall([
 		function(next){
 			User.getOneByUserAndPass(username, password, next);
 		},
@@ -57,75 +42,58 @@ GateService.prototype.loginUser = function(username, password, cb) {
 			if (user) {
 				next(null, user);
 			}else {
-				self.rslt = self.wrapCode("USER_NONE");
-				next(null, null);
+				next("USER_NONE");
 			}
 		},
-	], function(err, user){
+	], function(err, data){
 		if (err) return cb(err);
-		if (user){
-			self.rslt.data = user;
-		}
-		cb(null, self.rslt);
+		cb(null, data);
 	});
 
 };
 
-GateService.prototype.userWeak = function(cb) {
-	var self = this;
-
-	async.waterfall([
+GateService.userWeak = function(cb) {
+	this.waterfall([
 		function(next){
 			var randomName = '';
 			for (var i=0; i<8; i++) {
 				var idx = _.random(0, 61);
-				randomName += self.aplphas.substr(idx, 1);
+				randomName += this.aplphas.substr(idx, 1);
 			}
-			next(null, randomName);
+			User.createOne(randomName, null, null, next);
 		},
-		function(randomName, next){
-			//self.createUser(randomName, null, '1111111', '111111', next);
-			User.createOne(randomName, null, '12345678', next);
-		}
-	], function(err, user){
+	], function(err, data){
 		if (err) return cb(err);
-		if (user){
-			self.rslt.data = user;
-		}
-		cb(null, self.rslt);
+		cb(null, data);
 	});
 
 };
 
-GateService.prototype.listWorld = function(cb) {
-	var self = this;
+GateService.listWorld = function(cb) {
 
-	async.waterfall([
+	this.waterfall([
 		function(next){
 			World.getAll(next);
 		},
 	], function(err, worlds){
 		if (err) return cb(err);
 		if (!worlds || !worlds.length){
-			self.rslt = self.wrapCode("WORLD_NONE");
-		}else {
-			self.rslt.data = worlds;
+			return cb("WORLD_NONE");
 		}
-		cb(null, self.rslt);
+		cb(null, worlds);	
 	});
 };
 
+GateService.createWorld = function(name, port, cap, cb) {
 
-GateService.prototype.createWorld = function(name, port, cap, cb) {
-	var self = this;
-
+	var rslt = {};
 	async.waterfall([
 		function(next){
 			World.getOne(port, next);
 		}, 
 		function(world, next) {
 			if (world) {
-				self.rslt = self.wrapCode("WORLD_DUPLICATE");
+				rslt = self.wrapCode("WORLD_DUPLICATE");
 				next(null, world);
 			}else {
 				World.createOne(name, port, cap, next);
@@ -134,10 +102,13 @@ GateService.prototype.createWorld = function(name, port, cap, cb) {
 	], function(err, world){
 		if(err) return cb(err);
 		if (world) {
-			self.rslt.data = world;
+			rslt.data = world;
 		}
-		cb(null, self.rslt);
+		cb(null, rslt);
 	});
+
 };
+
+module.exports = GateService;
 
 

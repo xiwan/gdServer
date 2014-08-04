@@ -25,13 +25,13 @@ var _fields = {
   },
 };
 
-var User = BaseModel.extend(_fields);
-User.classname = "User";
+var User = BaseModel.extend(_fields, "User");
+var self = User; //Attention: this and self are not same object
 
 // Lifecycle callback
 User.beforeCreate = function(values, next){
   crypt.md5(values.password, null, function(err, hash){
-    User.debug(hash);
+    //User.debug(hash);
     if(err) return next(err);
     var now = misc.now();
     values.lastLoginAt = now;
@@ -43,12 +43,11 @@ User.beforeCreate = function(values, next){
 };
 
 User.createOne = function(username, phoneNumber, password, cb) {
-  this.debug(username, phoneNumber, password);
 	this
 		.create({
       username: username,
       phoneNumber: phoneNumber || '111-222-333',
-      password: password,
+      password: password || '12345678',
       banned: false,
     })
 		.done(function(err, user){

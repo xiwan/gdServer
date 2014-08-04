@@ -3,79 +3,72 @@
 
 var BaseController = require('./BaseController');
 
-var GateController = BaseController.extend({});
-GateController.classname = "GateController";
+var GateController = BaseController.extend("GateController");
+var self = GateController;
 
 // user login
 GateController.userLogin = function(req, res) {
-	var gateService = new GateService(res);
-	var sessionService = new SessionService(res);
 
 	var username = req.param('username');
 	var password = req.param('password');
 
-	async.waterfall([
-		function (next){
-			gateService.loginUser(username, password, next);
+	self.series({
+		login: function(next){
+			GateService.loginUser(username, password, next);
 		},
-		function (rslt, next){
-			if (sessionService.checkpoint(rslt)) {
-				sessionService.create(username, next);
-			}else {
-				next(null, rslt)
-			}
+		session: function(next, _data){
+			SessionService.create(username, next);
 		}
-	], function(err, rslt){
-		if (err) return res.send(err, 500);
-		res.json(rslt);
+	}, function(err, _data){
+		if (err){
+			return res.pack(null, err);
+		} 
+		res.pack(_data);
 	});
 
 };
 
 // user create
 GateController.userCreate = function(req, res) {
-	var gateService = new GateService(res);
 
 	var username = req.param('username');
 	var phoneNumber = req.param('phoneNumber');
 	var password = req.param('password');
 	var rptpassword = req.param('rptpassword');
 
-	async.waterfall([
+	self.waterfall([
 		function(next){
-			gateService.createUser(username, phoneNumber, password, rptpassword, next);
+			GateService.createUser(username, phoneNumber, password, rptpassword, next);
 		},
-	], function(err, rslt){
-		if (err) return res.send(err, 500);
-		res.json(rslt);
+	], function(err, _data){
+		if (err) return res.pack(null, err);
+		res.pack(_data);
 	});
 };
 
 // weak account fast playing
 GateController.userWeak = function(req, res) {
-	var gateService = new GateService(res);
 
-	async.waterfall([
+	self.waterfall([
 		function(next){
-			gateService.userWeak(next);
+			GateService.userWeak(next);
 		},
-	], function(err, rslt){
-		if (err) return res.send(err, 500);
-		res.json(rslt);
+	], function(err, _data){
+		if (err) return res.pack(null, err);
+		res.pack(_data);
 	});
 };
 
 // list all worlds
 GateController.worldList = function(req, res) {
-	var gateService = new GateService(res);
 	
-	async.waterfall([
+	self.waterfall([
 		function (next) {
-			gateService.listWorld(next);
+			GateService.listWorld(next);
 		},
-	], function(err, rslt){
-		if (err) return res.send(err, 500);
-		res.json(rslt);
+	], function(err, _data){
+		if (err) return res.pack(null, err);
+		res.pack(_data);
 	});
 };
 

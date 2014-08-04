@@ -14,14 +14,13 @@ var _fields = {
   entryLevel: { type: 'integer', defaultsTo: 0, },
 };
 
-var World = BaseModel.extend(_fields);
-World.classname = "World";
+var World = BaseModel.extend(_fields, "World");
+var self = World;
 
 // Lifecycle callback
 World.beforeCreate =  function(values, next) {
-  console.log(values)
 	if (values.name == null || values.port == null || values.capacity == null) {
-		next(new Error("Config structure is invalid"));
+		next(this.Error("WORLD_CREATE_FAIL"));
 	}else {
     var now = misc.now();
     values.createdAt = now;

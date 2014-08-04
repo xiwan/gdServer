@@ -8,6 +8,7 @@ var _fields = {
 };
 
 var Config = BaseModel.extend(_fields);
+Config.classname = "Config";
 
 Config.getOne = function(key, cb){
 	this

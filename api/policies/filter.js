@@ -2,24 +2,62 @@
 
 var Class = require('../utils/ClassUtils');
 var misc = require('../utils/MiscUtils');
-var util = require('util');
+var code = require('../utils/CodeUtils');
+
+//var util = require('util');
 
 
-module.exports = Filter;
+var Filter = new Class();
+Filter.classname = "Filter";
 
-function Filter(req, res){
-	Filter.super_.apply(this, arguments);
-	this.classname = "Filter";
-	this.debug(req.method, req.url);
+var self = Filter;
+
+Filter.url = function(req, res) {
+
+	self.debug(req.method, req.url);
 	if (!_.isEmpty(req.body)){
-		this.debug("Body ", JSON.stringify(req.body));
+		self.debug("Body ", JSON.stringify(req.body));
 	}
+
 };
 
-util.inherits(Filter, Class);
+Filter.extendResponse = function(req, res, cb) {
 
-Filter.prototype.isAuthed = function(req, res, cb) {
-	var self = this;
+
+	// bind function to req
+	// Usage: 
+	// 		1: pack(data)
+	//		2: pack(data, code)
+	//    3: pack(data, code, param1, param2, ...)
+	res.pack = function(){
+		var _data = _.toArray(arguments)[0];
+		var _code = _.toArray(arguments)[1];
+		var _params = _.toArray(arguments).slice(2);
+
+		var response = code(res, _code, _params);
+		if (_data){
+			response.data = _data;
+		}
+			
+		this.json(response);
+	};
+
+	cb(null, res);
+};
+
+// function Filter(req, res){
+// 	Filter.super_.apply(this, arguments);
+// 	this.classname = "Filter";
+// 	this.debug(req.method, req.url);
+// 	if (!_.isEmpty(req.body)){
+// 		this.debug("Body ", JSON.stringify(req.body));
+// 	}
+// };
+
+// util.inherits(Filter, Class);
+
+Filter.isAuthed = function(req, res, cb) {
+	
 	var sid = req.param('sid');
 	async.waterfall([
 		function(next){
@@ -87,7 +125,7 @@ Filter.prototype.isAuthed = function(req, res, cb) {
 
 };
 
-Filter.prototype.lang = function (req, res, cb){
+Filter.lang = function (req, res, cb){
 	var lang = req.param("lang");
 	req.locale = (lang)?lang:'en';
 	cb(null, req);
@@ -96,8 +134,7 @@ Filter.prototype.lang = function (req, res, cb){
 	// if v < db v, then go to master data downloading logic
 	// if v = db v, nothing happend,
 	// if v > db v, degrade to db v or error happens
-Filter.prototype.version = function (req, res, cb) {
-	var self = this;
+Filter.version = function (req, res, cb) {
 	var _v = 0;
 	async.waterfall([
 		function(next){
@@ -129,7 +166,7 @@ Filter.prototype.version = function (req, res, cb) {
 
 };
 
-Filter.prototype.isBanned = function(req, res, cb) {
+Filter.isBanned = function(req, res, cb) {
 	if (req.gameUser) {
 		if (req.gameUser.banned){
 			cb(self.Error("USER_BANNED"));
@@ -138,9 +175,9 @@ Filter.prototype.isBanned = function(req, res, cb) {
 		cb(self.Error("USER_NONE"));
 	}
 	cb(null, req);
-}
+};
 
-Filter.prototype.isUnderMaintenanceForAllUser = function (req, res, cb) {
+Filter.isUnderMaintenanceForAllUser = function (req, res, cb) {
 	// here we retrieve world status
 	var maintenance = {
 		isUnderMaintenance: false,
@@ -150,5 +187,7 @@ Filter.prototype.isUnderMaintenanceForAllUser = function (req, res, cb) {
 	}else {
 		cb(null, req);
 	}
-}
+};
+
+module.exports = Filter;
 

@@ -37,7 +37,7 @@ function registerWorld(cb){
   var _name = sails.config[process.env.NODE_ENV].env.name;
   var _port = sails.config[process.env.NODE_ENV].env.port;
   var _cap = sails.config[process.env.NODE_ENV].env.cap;
-
+  
   async.waterfall([
     function(next){
       World.getOne(_port, next);
