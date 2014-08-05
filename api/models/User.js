@@ -73,6 +73,7 @@ User.updateWorld = function(username, worldname, cb) {
     .findOneByUsername(username)
     .then(function(user){
       user.lastLoginWorld = worldname;
+      user.lastLoginAt = misc.now();
       user.updatedAt = misc.now();
       user.save(function(err){
         cb(err, user);

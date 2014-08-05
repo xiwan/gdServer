@@ -87,10 +87,10 @@ SessionService.refresh = function(sid, username, worldname, cb){
 
 // if the user not login to world, the format is: val:now:expire;
 // otherwise the format is: world:val:now
-// every user/account can only have one session at the same moment;
+// every user/account can only have one session at the same time;
 function _build (val1, val2) {
 	var now = misc.now();
-	var expire = now + 7200;
+	//var expire = now + 7200;
 	if (val1 && val2){
 		return val1 + ":" + val2 + ":" + now;
 	}

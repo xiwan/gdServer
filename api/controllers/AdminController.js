@@ -3,8 +3,17 @@
 
 var BaseController = require('./BaseController');
 
-var AdminController = BaseController.extend("AdminController");
+var config = {
+	prefix: '/api/v2',
+};
+
+var AdminController = BaseController.extend("AdminController", config);
 var self = AdminController;
+
+AdminController.index = function(req, res) {
+	//console.log(sails.router);
+	res.view('admin/index');
+};
 
 // list all worlds
 AdminController.worldList = function(req, res) {
@@ -17,7 +26,7 @@ AdminController.worldList = function(req, res) {
 		if (err) return res.pack(null, err);
 		res.pack(_data);
 	});
-}
+};
 
 // create world
 AdminController.worldCreate = function(req, res){
@@ -34,7 +43,6 @@ AdminController.worldCreate = function(req, res){
 		if (err) return res.pack(null, err);
 		res.pack(_data);
 	});
-}
-
+};
 
 module.exports = AdminController;

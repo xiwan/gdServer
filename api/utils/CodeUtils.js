@@ -57,13 +57,11 @@ function ForbiddenError(name, message) {
 
 util.inherits(ForbiddenError, Error);
 
-
 function NotFoundError(name, message) {
   _codeError.apply(this, arguments);
 }
 
 util.inherits(NotFoundError, Error);
-
 
 function InternalError(name, message) {
   _codeError.apply(this, arguments);

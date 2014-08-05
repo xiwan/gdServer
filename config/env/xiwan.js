@@ -8,7 +8,8 @@ module.exports = {
 
 	env: {
 		name: 'localhost',
-		port: 8080,		
+		port: 8080,
+		router: ['admin', 'app'],		
 	},
 
 	database: {

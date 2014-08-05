@@ -7,7 +7,7 @@ var util = require('util');
 module.exports = (function(){
 	var BaseController = {};
 
-	BaseController.extend = function(classname){
+	BaseController.extend = function(classname, config){
 
 		function _BaseController() {
 			Class.apply(this, arguments);
@@ -16,8 +16,13 @@ module.exports = (function(){
 		}
 
 		util.inherits(_BaseController, Class);
+		
+		var _BaseController_ = new _BaseController();
+		if (config){
+			_.extend(_BaseController_._config, config);
+		}
 
-		return new _BaseController();
+		return _BaseController_;
 	}
 
 	return BaseController;

@@ -28,6 +28,13 @@ module.exports.policies = {
   	worldChoose: 'createAuthed',
   },
 
+  AdminController: {
+  	index: true,
+  	worldList: 'create',
+  	worldCreate: 'create',
+
+  },
+
   /*
 	// Here's an example of adding some policies to a controller
 	RabbitController: {
