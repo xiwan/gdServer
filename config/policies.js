@@ -16,7 +16,17 @@ module.exports.policies = {
 
   // Default policy for all controllers and actions
   // (`true` allows public access) 
-  '*': true
+  '*': false,
+
+  GateController: {
+  	
+  	userLogin: 'create',
+  	userCreate: 'create',
+  	userWeak: 'create',
+
+  	worldList: 'createAuthed',
+  	worldChoose: 'createAuthed',
+  },
 
   /*
 	// Here's an example of adding some policies to a controller

@@ -21,10 +21,10 @@
  * For more information, check out:
  * http://sailsjs.org/#documentation
  */
+'use strict';
 
 var fs = require('fs');
-var _ = require('lodash');
-var logger = require('graceful-logger');
+var logger = require('../api/utils/LoggerUtils');
 var defaults = require('./env/defaults');
 
 module.exports = (function(){

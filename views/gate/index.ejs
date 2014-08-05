@@ -1,0 +1,77 @@
+
+
+<div class="container clearfix">
+<h2>Login page</h2>
+<hr />
+
+	<form id="loginForm" >
+		<div>username: <input name="username" value="" /> </div>
+		<div>password:<input name="password" value="" /> </div>
+		<div><input id="loginBtn" type="button" value="login"/></div>
+	</form>
+<h2>Register page</h2>
+<hr />
+	<form id="registerForm" >
+		<div>username: <input name="username" value="" /> </div>
+		<div>phoneNumber: <input name="phoneNumber" value="" /> </div>
+		<div>password:<input name="password" value="" /> </div>
+		<div>Repeat Password:<input name="rptpassword" value="" /> </div>
+		<div><input id="registerBtn" type="button" value="create"/></div>
+	</form>
+<h2>Weak Account page</h2>
+	<div><input id="weakBtn" type="button" value="create"/></div>
+<hr />
+</div>
+
+<script type='text/javascript'>
+	$("#loginBtn").click(function(){
+		$.ajax({
+			type: 'POST',
+			url: '/gate/user/login?lang=en',
+			data: {
+				username: $("#loginForm").find("input[name='username']").val(), 
+				password: $("#loginForm").find("input[name='password']").val(), 
+			},
+			success: function (data){
+				alert('ok: '+ data.code);
+			},
+			error: function(data){
+				alert('error: '+ data);
+			}
+		});
+	});
+
+	$("#registerBtn").click(function(){
+		$.ajax({
+			type: 'POST',
+			url: '/gate/user/create',
+			data: {
+				username: $("#registerForm").find("input[name='username']").val(), 
+				phoneNumber: $("#registerForm").find("input[name='phoneNumber']").val(), 
+				password: $("#registerForm").find("input[name='password']").val(), 
+				rptpassword: $("#registerForm").find("input[name='rptpassword']").val(), 
+			},
+			success: function (data){
+				alert('ok: '+ data.code);
+			},
+			error: function(data){
+				alert('error: '+ data);
+			}
+		});
+	});
+
+	$("#weakBtn").click(function(){
+		$.ajax({
+			type: 'POST',
+			url: '/gate/user/weak',
+			success: function (data){
+				alert('ok: '+ data.code);
+			},
+			error: function(data){
+				alert('error: '+ data);
+			}
+		});
+		
+	});
+
+</script>
