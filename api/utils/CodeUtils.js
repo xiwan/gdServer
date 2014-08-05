@@ -1,11 +1,18 @@
 
 var util = require('util');
 
-module.exports = CodeUtils;
-
 function CodeUtils(res, code, params) {
-  if (code instanceof Error){
-    return new CodeError(code, "ERROR_INTERNAL");
+
+  if (code == "BAD_REQUEST" || code instanceof BadRequestError){
+    return new BadRequestError("BAD_REQUEST", code);
+  }else if (code == "FORBIDDEN" || code instanceof ForbiddenError){
+    return new ForbiddenError("FORBIDDEN", code);
+  }else if (code == "NOT_FOUND" || code instanceof NotFoundError){
+    return new NotFoundError("NOT_FOUND", code);
+  }else if (code == "SERVICE_UNAVAILABLE" || code instanceof ServiceUnavailableError ){
+    return new ServiceUnavailableError("SERVICE_UNAVAILABLE", code);
+  }else if (code == "ERROR_INTERNAL" || code instanceof InternalError || code instanceof Error){
+    return new InternalError("ERROR_INTERNAL", code);
   }
 
   var codeMsg = {};
@@ -20,22 +27,56 @@ function CodeUtils(res, code, params) {
   return codeMsg;
 }
 
-function CodeError(message, code) {
+module.exports = CodeUtils;
+
+function _codeError(name, message) {
   // in production mode, should disable this error stack 
   // possibly insecure
   Error.call(this, message);
-  Error.captureStackTrace(this, CodeError);
+  Error.captureStackTrace(this, this.constructor);
 
-  //this.name = code;
-  this.code = CodeUtils[code];
-  this.message = code + " : " + message;
+  this.name = name;
+  this.code = CodeUtils[name];
+  this.message = "" + message;
 
   if (this.stack && this.stack.length) {
     console.log(this.stack);
   }
 }
 
-util.inherits(CodeError, Error);
+function BadRequestError(name, message) {
+  _codeError.apply(this, arguments);
+}
+
+util.inherits(BadRequestError, Error);
+
+
+function ForbiddenError(name, message) {
+  _codeError.apply(this, arguments);
+}
+
+util.inherits(ForbiddenError, Error);
+
+
+function NotFoundError(name, message) {
+  _codeError.apply(this, arguments);
+}
+
+util.inherits(NotFoundError, Error);
+
+
+function InternalError(name, message) {
+  _codeError.apply(this, arguments);
+}
+
+util.inherits(InternalError, Error);
+
+function ServiceUnavailableError(name, message) {
+  _codeError.apply(this, arguments);
+}
+
+util.inherits(ServiceUnavailableError, Error);
+
 
 /*
   ATTENTION: the suffix number identify how many parameters need to be passed.
@@ -65,13 +106,12 @@ CodeUtils.AUTH_BAD_SID= 1012;
 CodeUtils.AUTH_EXPIRED_SID = 1013;
 CodeUtils.AUTH_USER_NONE = 1014;
 
-CodeUtils.SERVICE_UNAVAILABLE = 1015;
-
 CodeUtils.NORMAL = 200;
 CodeUtils.BAD_REQUEST = 400;
 CodeUtils.FORBIDDEN = 403;
 CodeUtils.NOT_FOUND = 404;
 CodeUtils.ERROR_INTERNAL = 500;
+CodeUtils.SERVICE_UNAVAILABLE = 503;
 
 // function array_merge() {
 //   //   example 1: arr1 = {"color": "red", 0: 2, 1: 4}

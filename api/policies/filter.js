@@ -45,7 +45,8 @@ Filter.extendResponse = function(req, res, cb) {
 					_res.data = _data;
 				}
 
-				if (_res.code == 400 || _res.code == 403 || _res.code == 404 || _res.code == 500) {
+				if (_res.code == 400 || _res.code == 403 || _res.code == 404 
+					|| _res.code == 500 || _res.code == 503) {
 					res.send(_res, _res.code);
 				} else {
 					res.json(_res);
@@ -94,20 +95,19 @@ Filter.isAuthed = function(req, res, cb) {
 	async.waterfall([
 		function(next){
 			if (sid) {
-				try {
-        	global.cache.get(sid, next);
-        }catch(err) {
-        	next("AUTH_BAD_SID")
-        };
+        global.cache.hgetall(sid, next);
 			}else {
 				next("AUTH_NO_SID");
 			}
 		},
-		function(session, next){
-			if (!session){
+		function(sessionToken, next){
+			if (!sessionToken){
 				return next("AUTH_BAD_SID");
 			}
-			self.info(">>> session: ", session);
+			self.info(">>> session: ", sessionToken);
+			var session = sessionToken.session;
+			var _expire = sessionToken.expire; 
+
 			var sessionArr = session.split(":");
 			var len = sessionArr.length;
 			var now = misc.now();
@@ -115,31 +115,27 @@ Filter.isAuthed = function(req, res, cb) {
 			var _world = null;
 			var _username = null;
 			var _now = null;
-			var _expire = null;
 
-			if (len == 4) {
+			if (len == 3) {
 				// user in world
 				_world = sessionArr[0];
 				_username = sessionArr[1];
 				_now = sessionArr[2];
-				_expire = sessionArr[3];
 
-			}else if (len == 3) {
+			}else if (len == 2) {
 				// user not in world
 				_username = sessionArr[0];
 				_now = sessionArr[1];
-				_expire = sessionArr[2];
 
 			}else {
 				// abnormal condition;
 				next("AUTH_BAD_SID");
 			}
 
-			if (now <= _now) {
-				next("AUTH_BAD_SID");
-			}else if (now < _expire) {
-				// could use cache here to quick gameUser;
-				User.getOneByUserAndWorld(_username, _world, next);
+			if (now < _expire) {
+				global.cache.hmset(sid, {"session": session, "expire": now + 7200}, function(err, result){
+					next(null, _username, _world);
+				});
 			}else {
 				// clean the expired sid
 				global.cache.del(sid, function(err, _data){
@@ -148,6 +144,11 @@ Filter.isAuthed = function(req, res, cb) {
 			}
 
 		},
+		// could use cache here to quick gameUser;
+		function(_username, _world, next){		
+			User.getOneByUserAndWorld(_username, _world, next);
+		},
+
 	], function(err, user) {
 		if (err) cb(err);
 		if (!user) {
