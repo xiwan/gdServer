@@ -33,6 +33,13 @@ var _ = require('lodash');
 var local = require('./local');
 var logger = require('../api/utils/LoggerUtils');
 
+if (!String.prototype.trim) {
+   //code for trim
+   String.prototype.trim = function(){
+    return this.replace(/^\s+|\s+$/g, '');
+  };
+}
+
 module.exports.routes = (function(){
   var _routes = {};
   var _router = local.router;
@@ -41,11 +48,13 @@ module.exports.routes = (function(){
     if (_router_.prefix) {
       var prefix = _router_.prefix;
       delete _router_.prefix;
-      var _retuor_ = _.invert(_router_);
-      _retuor_ = _.transform(_retuor_, function(result, num, key){
-        result[key] = num.replace(/\ \//, ' ' + prefix + '/');
+      
+      var _router = {};
+      var keys = _.keys(_router_);
+      _.forEach(keys, function(num){
+        _router[(num.replace(/^\/|\ \//, ' ' + prefix + '/')).trim()] = _router_[num];
       }); 
-      _router_ = _.invert(_retuor_);     
+      return _router;  
     }
     return _router_;
   }    
@@ -65,7 +74,7 @@ module.exports.routes = (function(){
   }else {
     logger.warn(" no routes specified.");
   }
-  //logger.debug(_routes);
+  logger.debug(_routes);
   return _routes;
 }());
 
