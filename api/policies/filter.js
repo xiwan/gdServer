@@ -2,7 +2,7 @@
 
 var Class = require('../utils/ClassUtils');
 var misc = require('../utils/MiscUtils');
-var code = require('../utils/CodeUtils');
+var Code = require('../utils/CodeUtils');
 
 //var util = require('util');
 
@@ -11,17 +11,22 @@ var Filter = new Class("Filter");
 
 var self = Filter;
 
-Filter.url = function(req, res) {
+Filter.prepare = function (req, res, cb){
+	req._time = misc.now();
 
 	self.debug(req.method, req.url);
 	if (!_.isEmpty(req.body)){
 		self.debug("Body ", JSON.stringify(req.body));
 	}
 
+	var lang = req.param("lang");
+	req.locale = (lang)?lang:'en';
+	cb();
 };
 
 Filter.extendResponse = function(req, res, cb) {
 
+	res.request = req;
 
 	// bind function to req
 	// Usage: 
@@ -33,21 +38,55 @@ Filter.extendResponse = function(req, res, cb) {
 		var _code = _.toArray(arguments)[1];
 		var _params = _.toArray(arguments).slice(2);
 
-		var response = code(res, _code, _params);
-		if (!_.isEmpty(_data)){
-			response.data = _data;
-		}
+		self.series([
+			function(next){
+				var _res = Code(res, _code, _params);
+				if (!_.isEmpty(_data)){
+					_res.data = _data;
+				}
 
-		if (response.code == 400 || response.code == 403 || response.code == 404 || response.code == 500) {
-			return this.send(response, response.code);
-		} 
+				if (_res.code == 400 || _res.code == 403 || _res.code == 404 || _res.code == 500) {
+					res.send(_res, _res.code);
+				} else {
+					res.json(_res);
+				}
+				next(null, _res);
+			},
+			function(next){
+				_afterLog(req, res, next);			
+			},
+			function(next){
+				_afterDestroy(req, res, next);	
+			},
+		], function(err, _data){});
 
-		return this.json(response);
 	};
 
 	cb(null, res);
 };
 
+Filter.extendRequest = function(req, res, cb) {
+	cb();
+}
+
+function _afterLog(req, res, cb){
+	cb();	
+};
+
+function _afterDestroy(req, res, cb){
+	req._time = misc.now() - req._time;
+	self.debug(">>> time spent: " + req._time );
+
+	req._time = null;
+	req.sid = null;
+	req.gameUser = null;
+	req.v = null;
+
+	res.request = null;
+	res.pack = null;
+	res.send = null;
+	cb();
+};
 
 Filter.isAuthed = function(req, res, cb) {
 	
@@ -102,7 +141,10 @@ Filter.isAuthed = function(req, res, cb) {
 				// could use cache here to quick gameUser;
 				User.getOneByUserAndWorld(_username, _world, next);
 			}else {
-				next("AUTH_EXPIRED_SID");
+				// clean the expired sid
+				global.cache.del(sid, function(err, _data){
+					next("AUTH_EXPIRED_SID");
+				});
 			}
 
 		},
@@ -114,21 +156,17 @@ Filter.isAuthed = function(req, res, cb) {
 		if (user.sid != sid) {
 			return cb("AUTH_BAD_SID");
 		}
+		req.sid = sid;
 		req.gameUser = user;
-		cb(null, req);
+		cb();
 	});
 
 };
 
-Filter.lang = function (req, res, cb){
-	var lang = req.param("lang");
-	req.locale = (lang)?lang:'en';
-	cb(null, req);
-};
 
-	// if v < db v, then go to master data downloading logic
-	// if v = db v, nothing happend,
-	// if v > db v, degrade to db v or error happens
+// if v < db v, then go to master data downloading logic
+// if v = db v, nothing happend,
+// if v > db v, degrade to db v or error happens
 Filter.version = function (req, res, cb) {
 	var _v = 0;
 	async.waterfall([
@@ -158,7 +196,8 @@ Filter.version = function (req, res, cb) {
 		if (v > _v) {
 			return cb("CONFLICT_VERSION");
 		}
-		cb(null, req);
+		req.v = v;
+		cb();
 	});
 
 };
@@ -171,7 +210,7 @@ Filter.isBanned = function(req, res, cb) {
 	}else {
 		cb("USER_NONE");
 	}
-	cb(null, req);
+	cb();
 };
 
 Filter.isUnderMaintenanceForAllUser = function (req, res, cb) {
@@ -182,7 +221,7 @@ Filter.isUnderMaintenanceForAllUser = function (req, res, cb) {
 	if (maintenance.isUnderMaintenance) {
 		cb("SERVICE_UNAVAILABLE");
 	}else {
-		cb(null, req);
+		cb();
 	}
 };
 

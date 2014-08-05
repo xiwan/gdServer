@@ -47,7 +47,7 @@ SessionService.refresh = function(sid, username, worldname, cb){
 			if (!session){
 				next("AUTH_BAD_SID");
 			}else{
-				global.cache.del(sid, next)
+				global.cache.del(sid, next);
 			}
 		},
 		function(_data, next){

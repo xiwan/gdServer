@@ -30,7 +30,7 @@ ClassUtils.prototype.err = function() {
 };
 
 ClassUtils.prototype.Error = function(name){
-	return new code.Error(name)
+	return null;//new code.Error(name)
 };
 
 ClassUtils.prototype._createCb = function(callback) {

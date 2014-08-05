@@ -4,13 +4,11 @@ var util = require('util');
 module.exports = CodeUtils;
 
 function CodeUtils(res, code, params) {
-  var codeMsg = {};
   if (code instanceof Error){
-    codeMsg.code = CodeUtils.ERROR_INTERNAL;
-    codeMsg.message = "ERROR_INTERNAL";
-    return codeMsg;
+    return new CodeError(code, "ERROR_INTERNAL");
   }
 
+  var codeMsg = {};
   codeMsg.code = CodeUtils[code]||CodeUtils.NORMAL;
   //codeMsg.data = null;
   if (params){
@@ -22,15 +20,22 @@ function CodeUtils(res, code, params) {
   return codeMsg;
 }
 
-CodeUtils.Error = function(message) {
+function CodeError(message, code) {
   // in production mode, should disable this error stack 
   // possibly insecure
-  Error.captureStackTrace(this, this);
-  this.code = CodeUtils[message];
-  this.msg = message;
+  Error.call(this, message);
+  Error.captureStackTrace(this, CodeError);
+
+  //this.name = code;
+  this.code = CodeUtils[code];
+  this.message = code + " : " + message;
+
+  if (this.stack && this.stack.length) {
+    console.log(this.stack);
+  }
 }
 
-util.inherits(CodeUtils.Error, Error);
+util.inherits(CodeError, Error);
 
 /*
   ATTENTION: the suffix number identify how many parameters need to be passed.
