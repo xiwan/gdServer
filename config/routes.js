@@ -31,7 +31,6 @@
 var fs = require('fs');
 var _ = require('lodash');
 var local = require('./local');
-var logger = require('../api/utils/LoggerUtils');
 
 if (!String.prototype.trim) {
    //code for trim
@@ -72,7 +71,7 @@ module.exports.routes = (function(){
       _.assign(_routes, prefixAdd(_router_));
     }
   }else {
-    logger.warn(" no routes specified.");
+    console.log(" no routes specified.");
   }
   
   return _routes;

@@ -20,18 +20,18 @@ module.exports.policies = {
 
   GateController: {
   	
-  	userLogin: 'create',
-  	userCreate: 'create',
-  	userWeak: 'create',
+  	userLogin: 'noLogin',
+  	userCreate: 'noLogin',
+  	userWeak: 'noLogin',
 
-  	worldList: 'createAuthed',
-  	worldChoose: 'createAuthed',
+  	worldList: 'isAuthed',
+  	worldChoose: 'isAuthed',
   },
 
   AdminController: {
-  	index: 'create',
-  	worldList: 'create',
-  	worldCreate: 'create',
+  	index: 'noLogin',
+  	worldList: 'noLogin',
+  	worldCreate: 'noLogin',
 
   },
 

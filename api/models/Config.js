@@ -1,6 +1,6 @@
 'use strict';
 
-var BaseModel = require('./BaseModel');
+var BaseModel = require('../libs/BaseModel');
 
 var _fields = {
 		key: { type: 'string', maxLength: 32, minLength: 4, required: true, },

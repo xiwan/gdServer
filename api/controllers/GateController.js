@@ -1,7 +1,7 @@
 
 'use strict';
 
-var BaseController = require('./BaseController');
+var BaseController = require('../libs/BaseController');
 
 var GateController = BaseController.extend("GateController");
 var self = GateController;

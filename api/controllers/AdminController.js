@@ -1,7 +1,7 @@
 
 'use strict';
 
-var BaseController = require('./BaseController');
+var BaseController = require('../libs/BaseController');
 
 var config = {
 	prefix: '/api/v2',

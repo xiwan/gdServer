@@ -1,7 +1,7 @@
 'use strict';
 
 var misc = require('../utils/MiscUtils');
-var BaseModel = require('./BaseModel');
+var BaseModel = require('../libs/BaseModel');
 
 var _fields = {
   name: { type: 'string', minLength: 4, maxLength: 32, required: true, },

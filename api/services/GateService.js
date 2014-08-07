@@ -1,6 +1,6 @@
 
 var util = require('util');
-var BaseService = require('./BaseService');
+var BaseService = require('../libs/BaseService');
 
 var GateService = BaseService.extend("GateService");
 var self = GateService;
@@ -10,6 +10,10 @@ self.aplphas = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
 GateService.createUser = function(username, phoneNumber, password, rptpassword, cb) {
 	if (password != rptpassword) {
 		return cb("PASSWORD_NOT_MATCHED");
+	}
+
+	if (_.isEmpty(password)) {
+		return cb("PASSWORD_INVALID");
 	}
 
 	self.waterfall([

@@ -1,27 +1,27 @@
 'use strict';
 
-var Class = require('../utils/ClassUtils');
+var Class = require('./ExtendClass');
 var misc = require('../utils/MiscUtils');
 var Code = require('../utils/CodeUtils');
 var util = require('util');
 
-var Filter = new Class("Filter");
-var self = Filter;
+var BaseFilter = new Class("Filter");
+var self = BaseFilter;
 
-Filter.prepare = function (req, res, cb){
+BaseFilter.prepare = function (req, res, cb){
 	req._time = misc.now();
 
 	self.debug(req.method, req.url);
-	if (!_.isEmpty(req.body)){
-		self.debug("Body ", JSON.stringify(req.body));
-	}
+	// if (!_.isEmpty(req.body)){
+	// 	self.debug("Body ", JSON.stringify(req.body));
+	// }
 
 	var lang = req.param("lang");
 	req.locale = (lang)?lang:'en';
 	cb();
 };
 
-Filter.extendResponse = function(req, res, cb) {
+BaseFilter.extendResponse = function(req, res, cb) {
 
 	res.request = req;
 
@@ -63,7 +63,7 @@ Filter.extendResponse = function(req, res, cb) {
 	cb(null, res);
 };
 
-Filter.extendRequest = function(req, res, cb) {
+BaseFilter.extendRequest = function(req, res, cb) {
 	cb();
 }
 
@@ -86,7 +86,7 @@ function _afterDestroy(req, res, cb){
 	cb();
 };
 
-Filter.isAuthed = function(req, res, cb) {
+BaseFilter.isAuthed = function(req, res, cb) {
 	
 	var sid = req.param('sid');
 	async.waterfall([
@@ -186,7 +186,7 @@ function _isMaintenanceUser (user) {
 // if v < db v, then go to master data downloading logic
 // if v = db v, nothing happend,
 // if v > db v, degrade to db v or error happens
-Filter.isValidVersion = function (req, res, cb) {
+BaseFilter.isValidVersion = function (req, res, cb) {
 	var _v = 0;
 	async.waterfall([
 		function(next){
@@ -221,7 +221,7 @@ Filter.isValidVersion = function (req, res, cb) {
 
 };
 
-Filter.isValidWorld = function(req, res, cb) {
+BaseFilter.isValidWorld = function(req, res, cb) {
 	// if switch == 3, disabled current world, effect every one;
 	// if switch == 2, block current world's entrance, no effect on players;
 	// if switch == 1, block newbies to current world, no effect on players;
@@ -229,7 +229,7 @@ Filter.isValidWorld = function(req, res, cb) {
 	cb();
 };
 
-Filter.isBanned = function(req, res, cb) {
+BaseFilter.isBanned = function(req, res, cb) {
 	if (req.gameUser) {
 		if (req.gameUser.banned){
 			cb("USER_BANNED");
@@ -240,10 +240,10 @@ Filter.isBanned = function(req, res, cb) {
 	cb();
 };
 
-Filter.isUnderMaintenanceForAllUser = function (req, res, cb) {
+BaseFilter.isUnderMaintenanceForAllUser = function (req, res, cb) {
 	// todo: filter out request coming from admin site;
 	Config.getOne("maintenance", function(err, result) {
-		if (_.parseInt(result.value)) {
+		if (result && _.parseInt(result.value)) {
 			cb("SERVICE_UNAVAILABLE");
 		}else {
 			cb();
@@ -252,5 +252,5 @@ Filter.isUnderMaintenanceForAllUser = function (req, res, cb) {
 };
 
 
-module.exports = Filter;
+module.exports = BaseFilter;
 

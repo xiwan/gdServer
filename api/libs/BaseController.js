@@ -1,6 +1,6 @@
 'use strict';
 
-var Class = require('../utils/ClassUtils');
+var Class = require('./ExtendClass');
 var _ = require('lodash');
 var util = require('util');
 

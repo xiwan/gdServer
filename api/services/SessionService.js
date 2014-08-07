@@ -2,8 +2,7 @@
 var util = require('util');
 var misc = require('../utils/MiscUtils');
 var crypt = require('../utils/CryptUtils');
-//var RedisUtils = require('../utils/RedisUtils');
-var BaseService = require('./BaseService');
+var BaseService = require('../libs/BaseService');
 
 var SessionService = BaseService.extend("SessionService");
 var self = SessionService;

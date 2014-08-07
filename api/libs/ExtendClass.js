@@ -3,9 +3,9 @@
 //var logger = require('./LoggerUtils');
 //var code = require('../utils/CodeUtils');
 
-module.exports = ClassUtils;
+module.exports = ExtendClass;
 
-function ClassUtils(classname){
+function ExtendClass(classname){
 	this.classname = classname||"Class";
 };
 
@@ -19,30 +19,30 @@ function prependClassName(classname, args) {
   return _results;
 }
 
-ClassUtils.prototype.info = function() {
+ExtendClass.prototype.info = function() {
 	//logger.info.apply(logger, arguments);		
   sails.log.info.apply(this, prependClassName(this.classname, _.toArray(arguments)));
 };
 
-ClassUtils.prototype.debug = function() {
-	sails.log.debug.apply(this, prependClassName(this.classname, _.toArray(arguments)));	
+ExtendClass.prototype.debug = function() {
+  sails.log.debug.apply(this, prependClassName(this.classname, _.toArray(arguments)));	
 };
 
-ClassUtils.prototype.warn = function() {
+ExtendClass.prototype.warn = function() {
 	// logger.level(this.classname + " warn");
 	// logger.warn.apply(logger, arguments);	
   sails.log.warn.apply(this, prependClassName(this.classname, _.toArray(arguments)));	
 };
 
-ClassUtils.prototype.err = function() {
+ExtendClass.prototype.err = function() {
   sails.log.error.apply(this, prependClassName(this.classname, _.toArray(arguments))); 
 };
 
-ClassUtils.prototype.Error = function(name){
+ExtendClass.prototype.Error = function(name){
 	return null;//new code.Error(name)
 };
 
-ClassUtils.prototype._createCb = function(callback) {
+ExtendClass.prototype._createCb = function(callback) {
     if (!callback)
         return null;
     var self = this;
@@ -51,7 +51,7 @@ ClassUtils.prototype._createCb = function(callback) {
     };	
 };
 
-ClassUtils.prototype._bindSelf = function(tasks) {
+ExtendClass.prototype._bindSelf = function(tasks) {
     for (var i in tasks) {
         var task = tasks[i];
         if (task instanceof Array) {
@@ -63,7 +63,7 @@ ClassUtils.prototype._bindSelf = function(tasks) {
     }	
 };
 
-ClassUtils.prototype._createFunc = function(task, args) {
+ExtendClass.prototype._createFunc = function(task, args) {
     var self = this;
     return function() {
         try {
@@ -80,19 +80,19 @@ ClassUtils.prototype._createFunc = function(task, args) {
     };
 };
 
-ClassUtils.prototype.waterfall = function(tasks, callback) {
+ExtendClass.prototype.waterfall = function(tasks, callback) {
     this._bindSelf(tasks);
     callback = this._createCb(callback);
     async.waterfall(tasks, callback);	
 };
 
-ClassUtils.prototype.auto = function(tasks, callback) {
+ExtendClass.prototype.auto = function(tasks, callback) {
     this._bindSelf(tasks);
     callback = this._createCb(callback);
     async.auto(tasks, callback);	
 };
 
-ClassUtils.prototype.series = function(tasks, callback) {
+ExtendClass.prototype.series = function(tasks, callback) {
     var prev;
     var self = this;
     // use async.auto
@@ -109,31 +109,31 @@ ClassUtils.prototype.series = function(tasks, callback) {
     async.auto(tasks, callback);
 };
 
-ClassUtils.prototype.forEachSeries = function(list, tasks, callback) {
+ExtendClass.prototype.forEachSeries = function(list, tasks, callback) {
     this._bindSelf(tasks);
     callback = this._createCb(callback);
     async.forEachSeries(list, tasks, callback);	
 };
 
-ClassUtils.prototype.parallel = function(tasks, callback) {
+ExtendClass.prototype.parallel = function(tasks, callback) {
     this._bindSelf(tasks);
     callback = this._createCb(callback);
     async.parallel(tasks, callback);	
 };
 
-ClassUtils.prototype.map = function(list, tasks, callback) {
+ExtendClass.prototype.map = function(list, tasks, callback) {
     this._bindSelf(tasks);
     callback = this._createCb(callback);
     async.map(list, tasks, callback);	
 };
 
-ClassUtils.prototype.mapSeries = function(list, tasks, callback) {
+ExtendClass.prototype.mapSeries = function(list, tasks, callback) {
     this._bindSelf(tasks);
     callback = this._createCb(callback);
     async.mapSeries(list, tasks, callback);	
 };
 
-ClassUtils.prototype.getCallback = function(tasks, callback) {
+ExtendClass.prototype.getCallback = function(tasks, callback) {
     var key, cb;
     if (arguments.length == 1) {
         cb = arguments[0];

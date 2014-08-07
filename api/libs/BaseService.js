@@ -1,7 +1,7 @@
 'use strict';
 
 var code = require('../utils/CodeUtils');
-var Class = require('../utils/ClassUtils');
+var Class = require('./ExtendClass');
 var util = require('util');
 
 module.exports = (function(){
@@ -15,7 +15,6 @@ module.exports = (function(){
 		}
 
 		util.inherits(_BaseService, Class);
-
 
 		_BaseService.prototype.isOk = function(_code) {
 			return (_code.code == code.NORMAL) ? true: false;

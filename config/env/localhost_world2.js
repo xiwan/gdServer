@@ -1,4 +1,3 @@
-var logger = require('../../api/utils/LoggerUtils');
 
 var _replSet = {
 	servers: [{

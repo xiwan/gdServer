@@ -2,7 +2,7 @@
 
 var crypt = require('../utils/CryptUtils');
 var misc = require('../utils/MiscUtils');
-var BaseModel = require('./BaseModel');
+var BaseModel = require('../libs/BaseModel');
 
 var _fields = {
   username: { type: 'string', maxLength: 32, minLength: 4, required: true, },
@@ -32,7 +32,6 @@ var self = User; //Attention: this and self are not same object
 // Lifecycle callback
 User.beforeCreate = function(values, next){
   crypt.md5(values.password, null, function(err, hash){
-    //User.debug(hash);
     if(err) return next(err);
     var now = misc.now();
     values.lastLoginAt = now;
