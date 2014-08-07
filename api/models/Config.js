@@ -7,7 +7,7 @@ var _fields = {
 		value: { type: 'string', maxLength: 128, required: true, },
 };
 
-var Config = BaseModel.extend(_fields);
+var Config = BaseModel.extend(_fields, "mongo_gdHub");
 Config.classname = "Config";
 
 Config.getOne = function(key, cb){
@@ -33,5 +33,5 @@ Config.getAll = function(cb) {
 			cb(err, _configs);
 		});
 };
-
+//console.log(Config)
 module.exports = Config;

@@ -11,16 +11,13 @@ module.exports = function(req, res, cb) {
 		function(next){
 			filter.extendResponse(req, res, next);
 		},
-		function(next){
-			filter.isUnderMaintenanceForAllUser(req, res, next);
-		},
 		// is authed user ?
 		function(next) {
 			filter.isAuthed(req, res, next);
 		},
 		// master data version check
 		function(next) {
-			filter.version(req, res, next);
+			filter.isValidVersion(req, res, next);
 		},
 		function(next) {
 			filter.isBanned(req, res, next);

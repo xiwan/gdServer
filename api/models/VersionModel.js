@@ -12,9 +12,9 @@ module.exports = (function(){
 	// this is model for master data
 	var VersionModel = {};
 
-	VersionModel.extend = function(attributes){
+	VersionModel.extend = function(attributes, adapter){
 		
-		var _VersionModel = BaseModel.extend(_fields);
+		var _VersionModel = BaseModel.extend(_fields, adapter);
 		_VersionModel.classname = "VersionModel";
 
 		// static functions

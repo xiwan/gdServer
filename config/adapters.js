@@ -14,7 +14,7 @@
 'use strict';
 
 var fs = require('fs');
-var logger = require('../api/utils/LoggerUtils');
+//var logger = require('../api/utils/LoggerUtils');
 var defaults = require('./env/defaults');
 
 module.exports.adapters = (function(){
@@ -27,60 +27,9 @@ module.exports.adapters = (function(){
       logger.err("Config structure is invalid");
       throw new Error(" Config structure is invalid");
     }
-    logger.info('Loaded Database config for ' + defaults.environment + '.');
+    console.log('Loaded Database config for ' + defaults.environment + '.');
   }else {
-    logger.info('Database config for ' + defaults.environment +' not found.');
+    console.log('Database config for ' + defaults.environment +' not found.');
   }
   return database;
 }());
-
-// module.exports.adapters = {
-
-//   // If you leave the adapter config unspecified 
-//   // in a model definition, 'default' will be used.
-//   default: 'mongoDevelopment',
-
-//   mongoDevelopment: {
-//     module: 'sails-mongo',
-//     user: 'gdConn',
-//     password: '111111',
-//     database: 'gdGame',
-//     schema: true,
-//     replSet: {
-//       options: {
-//           readPreference: 'secondary',
-//       },
-//       servers: [{
-//           host: 'localhost',
-//           port: 27017,
-//       },
-//       {
-//           host: 'localhost',
-//           port: 27018,
-//       },
-//       {
-//           host: 'localhost',
-//           port: 27019,
-//       }]
-//     },
-//   },
-
-//   // Persistent adapter for DEVELOPMENT ONLY
-//   // (data is preserved when the server shuts down)
-//   // disk: {
-//   //   module: 'sails-disk'
-//   // },
-
-//   // MySQL is the world's most popular relational database.
-//   // Learn more: http://en.wikipedia.org/wiki/MySQL
-//   // myLocalMySQLDatabase: {
-
-//   //   module: 'sails-mysql',
-//   //   host: 'YOUR_MYSQL_SERVER_HOSTNAME_OR_IP_ADDRESS',
-//   //   user: 'YOUR_MYSQL_USER',
-//   //   // Psst.. You can put your password in config/local.js instead
-//   //   // so you don't inadvertently push it up if you're using version control
-//   //   password: 'YOUR_MYSQL_PASSWORD', 
-//   //   database: 'YOUR_MYSQL_DB'
-//   // }
-// };

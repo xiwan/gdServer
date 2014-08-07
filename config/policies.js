@@ -29,7 +29,7 @@ module.exports.policies = {
   },
 
   AdminController: {
-  	index: true,
+  	index: 'create',
   	worldList: 'create',
   	worldCreate: 'create',
 

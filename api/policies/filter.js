@@ -3,12 +3,9 @@
 var Class = require('../utils/ClassUtils');
 var misc = require('../utils/MiscUtils');
 var Code = require('../utils/CodeUtils');
-
-//var util = require('util');
-
+var util = require('util');
 
 var Filter = new Class("Filter");
-
 var self = Filter;
 
 Filter.prepare = function (req, res, cb){
@@ -93,14 +90,14 @@ Filter.isAuthed = function(req, res, cb) {
 	
 	var sid = req.param('sid');
 	async.waterfall([
-		function(next){
+		function (next){
 			if (sid) {
         global.cache.hgetall(sid, next);
 			}else {
 				next("AUTH_NO_SID");
 			}
 		},
-		function(sessionToken, next){
+		function (sessionToken, next){
 			if (!sessionToken){
 				return next("AUTH_BAD_SID");
 			}
@@ -145,18 +142,30 @@ Filter.isAuthed = function(req, res, cb) {
 
 		},
 		// could use cache here to quick gameUser;
-		function(_username, _world, next){		
+		function (_username, _world, next){		
 			User.getOneByUserAndWorld(_username, _world, next);
 		},
 
+		function (user, next) {
+			if (!user) {
+				return next("AUTH_USER_NONE");
+			}
+			if (user.sid != sid) {
+				return next("AUTH_BAD_SID");
+			}
+			// todo: filter out request coming from admin site;
+			Config.getOne("maintenance", function(err, result) {
+				if (_.parseInt(result.value)) {
+					if (!_isMaintenanceUser(user)){
+						next("SERVICE_UNAVAILABLE");
+					}
+				}else {
+					next(null, user);
+				}	
+			});
+		},
 	], function(err, user) {
 		if (err) cb(err);
-		if (!user) {
-			return cb("AUTH_USER_NONE");
-		}
-		if (user.sid != sid) {
-			return cb("AUTH_BAD_SID");
-		}
 		req.sid = sid;
 		req.gameUser = user;
 		cb();
@@ -164,11 +173,20 @@ Filter.isAuthed = function(req, res, cb) {
 
 };
 
+function _isMaintenanceUser (user) {
+	var users= sails.config[process.env.NODE_ENV].maintenance.users;
+  for (var i = 0; i < users.length; i++) {
+      if (user.username === users[i])
+          return true;
+  }
+  return false;
+};
+
 
 // if v < db v, then go to master data downloading logic
 // if v = db v, nothing happend,
 // if v > db v, degrade to db v or error happens
-Filter.version = function (req, res, cb) {
+Filter.isValidVersion = function (req, res, cb) {
 	var _v = 0;
 	async.waterfall([
 		function(next){
@@ -203,6 +221,14 @@ Filter.version = function (req, res, cb) {
 
 };
 
+Filter.isValidWorld = function(req, res, cb) {
+	// if switch == 3, disabled current world, effect every one;
+	// if switch == 2, block current world's entrance, no effect on players;
+	// if switch == 1, block newbies to current world, no effect on players;
+	// if switch == 0, welcome all;
+	cb();
+};
+
 Filter.isBanned = function(req, res, cb) {
 	if (req.gameUser) {
 		if (req.gameUser.banned){
@@ -215,16 +241,16 @@ Filter.isBanned = function(req, res, cb) {
 };
 
 Filter.isUnderMaintenanceForAllUser = function (req, res, cb) {
-	// here we retrieve world status
-	var maintenance = {
-		isUnderMaintenance: false,
-	};
-	if (maintenance.isUnderMaintenance) {
-		cb("SERVICE_UNAVAILABLE");
-	}else {
-		cb();
-	}
+	// todo: filter out request coming from admin site;
+	Config.getOne("maintenance", function(err, result) {
+		if (_.parseInt(result.value)) {
+			cb("SERVICE_UNAVAILABLE");
+		}else {
+			cb();
+		}	
+	});
 };
+
 
 module.exports = Filter;
 

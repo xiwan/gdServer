@@ -8,13 +8,17 @@ module.exports = (function(){
 
 	var BaseModel = {};
 
-	BaseModel.extend = function(attributes, classname){
+	BaseModel.extend = function(attributes, adapter){
 
 		function _BaseModel(){
 			Class.apply(this, arguments);
-			this.classname = classname||"BaseModel";
+			this.classname = "BaseModel";
+			// use a different adapter
+			this.adapter = adapter;
+
 			this.autoCreatedAt = false;
 			this.autoUpdatedAt = false;
+
 			this.attributes = {
 				createdAt: 'integer',
 			  updatedAt: 'integer',	
@@ -34,7 +38,7 @@ module.exports = (function(){
 		if (attributes){
 			_.extend(_BaseModel_.attributes, attributes);
 		}
-
+		//console.log(_BaseModel_)
 		// _.clone(_BaseModel, true)
 		return _BaseModel_;
 	}

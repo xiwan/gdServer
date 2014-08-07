@@ -74,7 +74,7 @@ module.exports.routes = (function(){
   }else {
     logger.warn(" no routes specified.");
   }
-  logger.debug(_routes);
+  
   return _routes;
 }());
 

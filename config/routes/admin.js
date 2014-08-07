@@ -1,6 +1,6 @@
 
 module.exports = {
-	prefix : '/securevisit',
+	prefix : '/v2',
 
 	'get /admin': 'AdminController.index',
   'get /admin/world/list': 'AdminController.worldList',

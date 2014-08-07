@@ -5,16 +5,19 @@ var BaseModel = require('./BaseModel');
 
 var _fields = {
   name: { type: 'string', minLength: 4, maxLength: 32, required: true, },
-  ipAddr: { type: 'ipv4' },
+  ipAddr: { type: 'string' },
   port: { type: 'integer', required: true, },
   delay: { type: 'integer', defaultsTo: 0, },
   population: { type: 'integer', defaultsTo: 0, },
   capacity: { type: 'integer', required: true, },
-  disabled: { type: 'boolean', defaultsTo: true },
+  // 0: normal; 1: block newbies; 2: block entry; 3: disabled;
+  switch: { type: 'integer', defaultsTo: 3 },
   entryLevel: { type: 'integer', defaultsTo: 0, },
+  nodeEnv: { type: 'string',  minLength: 4, maxLength: 32, },
 };
 
-var World = BaseModel.extend(_fields, "World");
+var World = BaseModel.extend(_fields, "mongo_gdHub");
+World.classname = "World";
 var self = World;
 
 // Lifecycle callback
@@ -25,6 +28,8 @@ World.beforeCreate =  function(values, next) {
     var now = misc.now();
     values.createdAt = now;
     values.updatedAt = now;
+    values.ipAddr = misc.getExternalIp();
+    values.nodeEnv = process.env.NODE_ENV;
 		next();
 	}
 };
@@ -65,8 +70,6 @@ World.createOne = function(name, port, cap, cb) {
 		delay: 0,
 		population: 0,
 		capacity: cap||5000,
-		disabled: true,
-		entryLevel: 0
 	};
 
 	this
@@ -87,6 +90,8 @@ World.updateByPort = function(update, port, cb) {
       if (update.popIncr) {
         world.population += update.popIncr;
       }
+      world.ipAddr = misc.getExternalIp();
+      world.nodeEnv = process.env.NODE_ENV;
       world.updatedAt = misc.now();
       world.save(function(err){
         cb(err, world);

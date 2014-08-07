@@ -12,7 +12,16 @@ var self = AdminController;
 
 AdminController.index = function(req, res) {
 	//console.log(sails.router);
-	res.view('admin/index');
+
+	self.waterfall([
+		function (next) {
+			GateService.listWorld(next);
+		},
+	], function(err, _data){
+		if (err) return res.notFound();
+		res.view('admin/index', {data:_data});
+	});
+
 };
 
 // list all worlds

@@ -1,7 +1,7 @@
 'use strict';
 
-var logger = require('./LoggerUtils');
-var code = require('../utils/CodeUtils');
+//var logger = require('./LoggerUtils');
+//var code = require('../utils/CodeUtils');
 
 module.exports = ClassUtils;
 
@@ -9,24 +9,33 @@ function ClassUtils(classname){
 	this.classname = classname||"Class";
 };
 
+function prependClassName(classname, args) {
+  var _i, _len, _results;
+  _results = [];
+  _results.push(classname);
+  for (_i = 0, _len = args.length; _i < _len; _i++) {
+    _results.push(args[_i]);
+  }
+  return _results;
+}
+
 ClassUtils.prototype.info = function() {
-	logger.level(this.classname + " info");
-	logger.info.apply(logger, arguments);		
+	//logger.info.apply(logger, arguments);		
+  sails.log.info.apply(this, prependClassName(this.classname, _.toArray(arguments)));
 };
 
 ClassUtils.prototype.debug = function() {
-	logger.level(this.classname + " debug");
-	logger.debug.apply(logger, arguments);		
+	sails.log.debug.apply(this, prependClassName(this.classname, _.toArray(arguments)));	
 };
 
 ClassUtils.prototype.warn = function() {
-	logger.level(this.classname + " warn");
-	logger.warn.apply(logger, arguments);		
+	// logger.level(this.classname + " warn");
+	// logger.warn.apply(logger, arguments);	
+  sails.log.warn.apply(this, prependClassName(this.classname, _.toArray(arguments)));	
 };
 
 ClassUtils.prototype.err = function() {
-	logger.level(this.classname + " err");
-	logger.err.apply(logger, arguments);		
+  sails.log.error.apply(this, prependClassName(this.classname, _.toArray(arguments))); 
 };
 
 ClassUtils.prototype.Error = function(name){

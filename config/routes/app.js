@@ -1,6 +1,5 @@
 
 module.exports = {
-	prefix: '/v2',
 
   '/gate': {
     view: 'gate/index',

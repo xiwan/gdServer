@@ -1,0 +1,55 @@
+#!/usr/bin/env node
+
+
+function init(){
+    // The following is to figure out where the deprecation warning is coming from.
+    // Do not move it. -- Edmond
+    var util = require('util');
+    var _warning = util._deprecationWarning;
+    
+    util._deprecationWarning = function () {
+        // Provide users a message describing that the warning message is just that, a warning.
+        console.error('The following message is a warning that the sys module is deprecated, but still present. '+
+                      'An NPM module we use refers to the \'sys\' module, when it should use \'util\', triggering '+
+                      'this message.');
+        _warning.apply(util, arguments);
+        // If you want see where the deprecation message is coming from, uncomment the following line:
+        //console.trace();
+    };
+}
+
+function run() {
+	var _ = require("lodash");
+	var fs = require('fs');
+	var shell = require('shelljs');
+	
+	try {
+		var argv = require('optimist')
+			.usage('Usage: $0 --env NODE_ENV')
+			.string('env')
+			.demand('env')
+			.argv;
+
+
+		if (_.isString(argv.env)) {
+			var cmd = argv.env.toLowerCase();
+			process.env.NODE_ENV = cmd;
+			process.env.DEBUG = 1;
+
+			var envConfigPath = __dirname + "/config/env/" + process.env.NODE_ENV + ".js";
+			if (fs.existsSync(envConfigPath)) {
+
+				shell.exec("sails lift", {async: true});
+
+			}	else {
+				console.log("no config file found!");
+			}
+		}
+
+	}catch (e) {
+		console.log('ERROR: '+e.message);
+	}
+}
+
+init();
+run();
