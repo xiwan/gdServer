@@ -1,6 +1,7 @@
 
 var util = require('util');
 var BaseService = require('../libs/BaseService');
+var Const = require('../Const');
 
 var GateService = BaseService.extend("GateService");
 var self = GateService;
@@ -103,6 +104,7 @@ function _chooseWorld (username, worldname, port, cb){
 			User.updateWorld(username, worldname, next);
 		},
 		updateWorld: function(next) {
+			// use timer to refresh world list
 			World.updateByPort({popIncr: 1}, port, next);
 		},
 	}, cb);
@@ -135,11 +137,20 @@ GateService.switchWorld = function(name, port, _switch, cb) {
 		},
 		function (world, next) {
 			if (world) {
-				World.updateByPort({'switch': _switch}, port, cb);
+				World.updateByPort({'switch': _switch}, port, next);
 			}else {
 				next("WORLD_NONE");
 			}
-		}
+		},
+		// refresh cache
+		function (_data, next) {
+			World.getAll(function (err, result){
+				var _result = JSON.stringify(result);
+				global.cache.set(Const.cache.worlds, _result, function(){
+					next(null, _data);
+				});
+			});
+		},
 	], function(err, world){
 		if (err) return cb(err);
 		cb(null, world);	

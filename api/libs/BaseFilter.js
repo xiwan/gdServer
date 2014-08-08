@@ -252,7 +252,7 @@ BaseFilter.isSwitchedOn = function(req, res, cb) {
 			var worlds = JSON.parse(_data.queryDb);
 			for (var i=0, len=worlds.length; i<len; i++) {
 				if (worlds[i].port == port) {
-					next(null, worlds[i]['switch']);
+					return next(null, worlds[i]['switch']);
 					break;
 				}
 			}
@@ -260,6 +260,7 @@ BaseFilter.isSwitchedOn = function(req, res, cb) {
 		}
 	}, function(err, _data){
 		if (err) return cb(err);
+		
 		switch (_data.querySwitch) {
 			// if switch == 0, welcome all;
 			case 0: cb(); break;

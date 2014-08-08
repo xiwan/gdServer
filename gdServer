@@ -25,9 +25,10 @@ function run() {
 	
 	try {
 		var argv = require('optimist')
-			.usage('Usage: $0 --env NODE_ENV')
+			.usage('Usage: $0 --env NODE_ENV [--routes]')
 			.string('env')
 			.demand('env')
+			.boolean('routes')
 			.argv;
 
 
@@ -38,12 +39,16 @@ function run() {
 
 			var envConfigPath = __dirname + "/config/env/" + process.env.NODE_ENV + ".js";
 			if (fs.existsSync(envConfigPath)) {
-
-				shell.exec("sails lift", {async: true});
-
+				if (_.isBoolean(argv.routes) && argv.routes) {
+					var cmd = argv.env.toLowerCase();
+					shell.exec("sails run showRoutes", {async: true});
+				}else {
+					shell.exec("sails lift", {async: true});
+				}
 			}	else {
 				console.log("no config file found!");
 			}
+
 		}
 
 	}catch (e) {
