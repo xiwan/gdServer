@@ -63,7 +63,7 @@ GateService.userWeak = function(cb) {
 				var idx = _.random(0, 61);
 				randomName += self.aplphas.substr(idx, 1);
 			}
-			User.createOne(randomName, null, null, next);
+			User.createOne(randomName, null, '12345678', next);
 		},
 	], function(err, data){
 		if (err) return cb(err);
@@ -111,16 +111,40 @@ function _chooseWorld (username, worldname, port, cb){
 GateService.listWorld = function(cb) {
 
 	self.waterfall([
-		function(next){
+		function (next){
 			World.getAll(next);
 		},
+		function (worlds, next) {
+			if (!worlds || !worlds.length){
+				next("WORLD_NONE");
+			}else {
+				next(null, worlds)
+			}	
+		}
 	], function(err, worlds){
 		if (err) return cb(err);
-		if (!worlds || !worlds.length){
-			return cb("WORLD_NONE");
-		}
 		cb(null, worlds);	
 	});
+};
+
+GateService.switchWorld = function(name, port, _switch, cb) {
+
+	self.waterfall([
+		function (next) {
+			World.getOne(name, port, next);
+		},
+		function (world, next) {
+			if (world) {
+				World.updateByPort({'switch': _switch}, port, cb);
+			}else {
+				next("WORLD_NONE");
+			}
+		}
+	], function(err, world){
+		if (err) return cb(err);
+		cb(null, world);	
+	});
+
 };
 
 GateService.createWorld = function(name, port, cap, cb) {
@@ -147,6 +171,7 @@ GateService.createWorld = function(name, port, cap, cb) {
 	});
 
 };
+
 
 module.exports = GateService;
 

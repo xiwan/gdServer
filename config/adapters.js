@@ -27,7 +27,7 @@ module.exports.adapters = (function(){
       logger.err("Config structure is invalid");
       throw new Error(" Config structure is invalid");
     }
-    console.log('Loaded Database config for ' + defaults.environment + '.');
+    //console.log('Loaded Database config for ' + defaults.environment + '.');
   }else {
     console.log('Database config for ' + defaults.environment +' not found.');
   }

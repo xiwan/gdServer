@@ -72,6 +72,7 @@ GateController.worldList = function(req, res) {
 
 GateController.worldChoose = function(req, res) {
 	var worldname = req.param('name');
+	// could retrieve port number through request
 	var port = _.parseInt(req.param('port'));
 	var sid = req.sid;
 	var username = req.gameUser.username;

@@ -4,5 +4,7 @@ module.exports = {
 
 	'get /admin': 'AdminController.index',
   'get /admin/world/list': 'AdminController.worldList',
+
+  'post /admin/world/switch': 'AdminController.worldSwitch',
   'post /admin/world/create': 'AdminController.worldCreate',
 };

@@ -28,9 +28,14 @@ module.exports.policies = {
   	worldChoose: 'isAuthed',
   },
 
+  LobbyController: {
+  	welcome: ['isAuthed', 'isSwitchedOn'],
+  },
+
   AdminController: {
   	index: 'noLogin',
-  	worldList: 'noLogin',
+    worldList: 'noLogin',
+  	worldSwitch: 'noLogin',
   	worldCreate: 'noLogin',
 
   },

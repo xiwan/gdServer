@@ -32,7 +32,7 @@ module.exports = (function(){
 
   if (fs.existsSync(envConfigPath)) {
     var env = require(envConfigPath).env;
-    console.log('Loaded environment config for ' + defaults.environment + '.');
+    //console.log('Loaded environment config for ' + defaults.environment + '.');
   }else {
     console.log('Environment config for ' + defaults.environment +' not found.');
   }

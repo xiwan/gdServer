@@ -26,7 +26,7 @@ module.exports.bootstrap = function (cb) {
   if (env.redis) {
   	redisInit(env.redis);
   }else if (env.memcached) {
-  	
+  	// no memcached
   }else {
   	sails.log.warn("no cache found!");
   }
@@ -42,8 +42,9 @@ function registerWorld(cb){
   var _port = sails.config[nodeEnv].env.port;
   var _cap = sails.config[nodeEnv].env.cap;
 
+
+  // admin site no need to register
   if (nodeEnv.indexOf('admin') > -1){
-    sails.log.warn("server is runing at port ", _port);
     return cb();
   }
 
@@ -60,7 +61,6 @@ function registerWorld(cb){
     }
   ], function (err, world) {
     if(err) return sails.log.error(err);
-    sails.log.warn("server is runing at port ", _port);
     cb();
   });
 }

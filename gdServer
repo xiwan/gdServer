@@ -14,7 +14,7 @@ function init(){
                       'this message.');
         _warning.apply(util, arguments);
         // If you want see where the deprecation message is coming from, uncomment the following line:
-        //console.trace();
+        console.trace();
     };
 }
 
@@ -34,7 +34,7 @@ function run() {
 		if (_.isString(argv.env)) {
 			var cmd = argv.env.toLowerCase();
 			process.env.NODE_ENV = cmd;
-			process.env.DEBUG = 1;
+			// process.env.DEBUG = 1;
 
 			var envConfigPath = __dirname + "/config/env/" + process.env.NODE_ENV + ".js";
 			if (fs.existsSync(envConfigPath)) {

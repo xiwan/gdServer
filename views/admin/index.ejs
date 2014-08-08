@@ -20,14 +20,14 @@
 	</tr>
 	<% for (var i=0; i<data.length; i++) { %>
 	<tr>
-		<td> <%= data[i].name %> </td>
+		<td> <a href="#"><%= data[i].name %></a> </td>
 		<td> <%= data[i].ipAddr %> </td>
 		<td> <%= data[i].port %> </td>
 		<td> <%= data[i].delay %> </td>
 		<td> <%= data[i].population %> </td>
 		<td> <%= data[i].capacity %> </td>
 		<td> 
-			<select name="switchSelect">
+			<select name="switchSelect" data-world="<%= data[i].name %>" data-port="<%= data[i].port %>">
 				<option value="0" <% if (data[i].switch=="0"){ %> 
 					selected='selected'
 				<% }%>>0: normal</option>
@@ -49,6 +49,32 @@
 	<% } %>
 </table>
 
+<script type='text/javascript'>
+	$("select[name='switchSelect']").change(function(){
+		var that = this;
+		var answer = confirm("Do you want to change the status?");
+		if (answer) {
+			$.ajax({
+				type: 'POST',
+				url: '<%= prefx %>/admin/world/switch',
+				data: {
+					name: $(that).attr("data-world"), 
+					port: $(that).attr("data-port"), 
+					'switch': $(that).val(), 
+				},
+				success: function(data){
+					alert('ok');
+				},
+				error: function(){
+					alert('error');
+				}
+			});
+		}
+
+	});
+
+</script>
+
 <hr />
 <h3>world register</h3>
 	<form id="worldCreateForm" >
@@ -64,7 +90,7 @@
 	$("#worldCreateBtn").click(function(){
 		$.ajax({
 			type: 'POST',
-			url: '/admin/world/create',
+			url: '<%= prefx %>/admin/world/create',
 			data: {
 				name: $("#worldCreateForm").find("input[name='name']").val(), 
 				port: $("#worldCreateForm").find("input[name='port']").val(), 

@@ -11,4 +11,6 @@ module.exports = {
 
   'get /gate/world/list': 'GateController.worldList',
   'post /gate/world/choose': 'GateController.worldChoose',
+
+  'get /lobby/welcome': 'LobbyController.welcome',
 };

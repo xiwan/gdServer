@@ -4,16 +4,24 @@ var misc = require('../utils/MiscUtils');
 var BaseModel = require('../libs/BaseModel');
 
 var _fields = {
-  name: { type: 'string', minLength: 4, maxLength: 32, required: true, },
-  ipAddr: { type: 'string' },
-  port: { type: 'integer', required: true, },
-  delay: { type: 'integer', defaultsTo: 0, },
-  population: { type: 'integer', defaultsTo: 0, },
-  capacity: { type: 'integer', required: true, },
-  // 0: normal; 1: block newbies; 2: block entry; 3: disabled;
-  switch: { type: 'integer', defaultsTo: 3 },
-  entryLevel: { type: 'integer', defaultsTo: 0, },
-  nodeEnv: { type: 'string',  minLength: 4, maxLength: 32, },
+  name: 					// world name, primary key 
+  	{ type: 'string', minLength: 4, maxLength: 32, required: true, },
+  ipAddr:   			// ip address 
+  	{ type: 'string' },
+  port: 					// world port number
+  	{ type: 'integer', required: true, },
+  delay: 					// request delay in ms
+  	{ type: 'integer', defaultsTo: 0, },
+  population: 		// current number of players in world
+  	{ type: 'integer', defaultsTo: 0, },
+  capacity: 			// world's capacity
+  	{ type: 'integer', required: true, },
+  'switch':  				// 0: normal; 1: block newbies; 2: block entry; 3: disabled;
+  	{ type: 'integer', defaultsTo: 3 },
+  entryLevel: 		// min level demanded
+  	{ type: 'integer', defaultsTo: 0, },
+  nodeEnv: 				// running config script
+  	{ type: 'string',  minLength: 4, maxLength: 32, },
 };
 
 var World = BaseModel.extend(_fields, "mongo_gdHub");
@@ -84,15 +92,21 @@ World.updateByPort = function(update, port, cb) {
   this
     .findOneByPort(port)
     .then(function(world){
+
       if (update.name) {
         world.name = update.name;
       }
       if (update.popIncr) {
         world.population += update.popIncr;
       }
+      if (update['switch']) {
+        world['switch'] = update['switch'];
+      }
+
       world.ipAddr = misc.getExternalIp();
       world.nodeEnv = process.env.NODE_ENV;
       world.updatedAt = misc.now();
+      
       world.save(function(err){
         cb(err, world);
       });

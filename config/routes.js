@@ -32,13 +32,6 @@ var fs = require('fs');
 var _ = require('lodash');
 var local = require('./local');
 
-if (!String.prototype.trim) {
-   //code for trim
-   String.prototype.trim = function(){
-    return this.replace(/^\s+|\s+$/g, '');
-  };
-}
-
 module.exports.routes = (function(){
   var _routes = {};
   var _router = local.router;
@@ -46,17 +39,22 @@ module.exports.routes = (function(){
   function prefixAdd (_router_) {
     if (_router_.prefix) {
       var prefix = _router_.prefix;
+      global.prefix = prefix;
       delete _router_.prefix;
       
       var _router = {};
       var keys = _.keys(_router_);
       _.forEach(keys, function(num){
-        _router[(num.replace(/^\/|\ \//, ' ' + prefix + '/')).trim()] = _router_[num];
+        _router[_trim(num.replace(/^\/|\ \//, ' ' + prefix + '/'))] = _router_[num];
       }); 
       return _router;  
     }
     return _router_;
-  }    
+  } 
+
+  function _trim(str) {
+    return str.replace(/^\s+|\s+$/g, '');
+  }   
 
   if (_.isArray(_router)){
     for(var i = 0; i<_router.length; i++){

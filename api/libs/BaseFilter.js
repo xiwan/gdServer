@@ -3,7 +3,9 @@
 var Class = require('./ExtendClass');
 var misc = require('../utils/MiscUtils');
 var Code = require('../utils/CodeUtils');
+var Const = require('../Const');
 var util = require('util');
+var url = require('url');
 
 var BaseFilter = new Class("Filter");
 var self = BaseFilter;
@@ -11,7 +13,8 @@ var self = BaseFilter;
 BaseFilter.prepare = function (req, res, cb){
 	req._time = misc.now();
 
-	self.debug(req.method, req.url);
+	//url.parse('http://' + req.url);
+	self.debug(req.method, req.url, req.port);
 	// if (!_.isEmpty(req.body)){
 	// 	self.debug("Body ", JSON.stringify(req.body));
 	// }
@@ -89,7 +92,7 @@ function _afterDestroy(req, res, cb){
 BaseFilter.isAuthed = function(req, res, cb) {
 	
 	var sid = req.param('sid');
-	async.waterfall([
+	self.waterfall([
 		function (next){
 			if (sid) {
         global.cache.hgetall(sid, next);
@@ -98,6 +101,7 @@ BaseFilter.isAuthed = function(req, res, cb) {
 			}
 		},
 		function (sessionToken, next){
+
 			if (!sessionToken){
 				return next("AUTH_BAD_SID");
 			}
@@ -165,7 +169,7 @@ BaseFilter.isAuthed = function(req, res, cb) {
 			});
 		},
 	], function(err, user) {
-		if (err) cb(err);
+		if (err) return cb(err);
 		req.sid = sid;
 		req.gameUser = user;
 		cb();
@@ -188,7 +192,7 @@ function _isMaintenanceUser (user) {
 // if v > db v, degrade to db v or error happens
 BaseFilter.isValidVersion = function (req, res, cb) {
 	var _v = 0;
-	async.waterfall([
+	self.waterfall([
 		function(next){
 			if (req.param && req.param('v')) {
 		      _v = _.parseInt(req.param('v'));  
@@ -221,12 +225,70 @@ BaseFilter.isValidVersion = function (req, res, cb) {
 
 };
 
-BaseFilter.isValidWorld = function(req, res, cb) {
-	// if switch == 3, disabled current world, effect every one;
-	// if switch == 2, block current world's entrance, no effect on players;
-	// if switch == 1, block newbies to current world, no effect on players;
-	// if switch == 0, welcome all;
-	cb();
+
+BaseFilter.isSwitchedOn = function(req, res, cb) {
+	var port = _.parseInt(req.port);
+
+	// need to investigate why hgetall and hmset doesnt work out any more.
+	self.series({
+		queryCache: function (next) {
+			global.cache.get(Const.cache.worlds, function(err, obj){
+				next(null, obj);
+			});
+		},
+		queryDb: function (next, _data) {
+			if (_data.queryCache){
+				next(null, _data.queryCache);
+			}else {
+				World.getAll(function (err, result){
+					var _result = JSON.stringify(result);
+					global.cache.set(Const.cache.worlds, _result, function(){
+						next(null, _result);
+					});
+				});
+			}
+		},
+		querySwitch: function(next, _data) {
+			var worlds = JSON.parse(_data.queryDb);
+			for (var i=0, len=worlds.length; i<len; i++) {
+				if (worlds[i].port == port) {
+					next(null, worlds[i]['switch']);
+					break;
+				}
+			}
+			next();
+		}
+	}, function(err, _data){
+		if (err) return cb(err);
+		switch (_data.querySwitch) {
+			// if switch == 0, welcome all;
+			case 0: cb(); break;
+			// if switch == 1, block newbies to current world, no effect on players;
+			case 1: 
+				if (req.gameUser.onMission){
+					cb();
+				} else {
+					if (req.gameUser.characters){
+						cb();
+					}else {
+						cb("SERVICE_UNAVAILABLE");
+					}
+				}
+			break;
+			// if switch == 2, block current world's entrance, no effect on players;
+			case 2: 
+				if (req.gameUser.onMission){
+					cb();
+				} else {
+					cb("SERVICE_UNAVAILABLE");
+				}
+			break;
+			// if switch == 3, disabled current world, effect every one;
+			case 3: cb("SERVICE_UNAVAILABLE"); break;
+			default: cb("SERVICE_UNAVAILABLE"); break;
+		}
+		
+	});
 };
 
 BaseFilter.isBanned = function(req, res, cb) {
@@ -244,10 +306,9 @@ BaseFilter.isUnderMaintenanceForAllUser = function (req, res, cb) {
 	// todo: filter out request coming from admin site;
 	Config.getOne("maintenance", function(err, result) {
 		if (result && _.parseInt(result.value)) {
-			cb("SERVICE_UNAVAILABLE");
-		}else {
-			cb();
-		}	
+			return cb("SERVICE_UNAVAILABLE");
+		}
+		cb();	
 	});
 };
 

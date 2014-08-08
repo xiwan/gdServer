@@ -3,23 +3,18 @@
 
 var BaseController = require('../libs/BaseController');
 
-var config = {
-	prefix: '/api/v2',
-};
-
-var AdminController = BaseController.extend("AdminController", config);
+var AdminController = BaseController.extend("AdminController");
 var self = AdminController;
 
+// list all worlds
 AdminController.index = function(req, res) {
-	//console.log(sails.router);
-
 	self.waterfall([
 		function (next) {
 			GateService.listWorld(next);
 		},
 	], function(err, _data){
 		if (err) return res.notFound();
-		res.view('admin/index', {data:_data});
+		res.view('admin/index', {data:_data, prefx: global.prefix});
 	});
 
 };
@@ -37,6 +32,22 @@ AdminController.worldList = function(req, res) {
 	});
 };
 
+// update world attribute
+AdminController.worldSwitch = function(req, res) {
+	var name = req.param('name');
+	var port = _.parseInt(req.param('port'));
+	var _switch = _.parseInt(req.param('switch'));
+	self.debug(name, port, _switch);
+	self.waterfall([
+		function (next) {
+			GateService.switchWorld(name, port, _switch, next);
+		},
+	], function(err, _data){
+		if (err) return res.pack(null, err);
+		res.pack(_data);
+	});
+};
+
 // create world
 AdminController.worldCreate = function(req, res){
 
@@ -46,7 +57,7 @@ AdminController.worldCreate = function(req, res){
 	
 	self.waterfall([
 		function (next) {
-			GateService.createWorld(name, port, cap, next)
+			GateService.createWorld(name, port, cap, next);
 		},
 	], function(err, _data){
 		if (err) return res.pack(null, err);
