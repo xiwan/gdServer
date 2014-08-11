@@ -6,7 +6,7 @@ var Const = require('../Const');
 var GateService = BaseService.extend("GateService");
 var self = GateService;
 
-self.aplphas = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
+self.aplphas = Const.aplphas;
 
 GateService.createUser = function(username, phoneNumber, password, rptpassword, cb) {
 	if (password != rptpassword) {

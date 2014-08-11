@@ -32,13 +32,21 @@ module.exports = (function(){
 		}
 
 		util.inherits(_BaseModel, Class);
+
+		_BaseModel.prototype.findCache = function(key){
+
+		};
+
+		_BaseModel.prototype.findLocalCache = function(key){
+
+		};
 		
 		// attributes merge
 		var _BaseModel_ = new _BaseModel();
 		if (attributes){
 			_.extend(_BaseModel_.attributes, attributes);
 		}
-		//console.log(_BaseModel_)
+
 		// _.clone(_BaseModel, true)
 		return _BaseModel_;
 	}

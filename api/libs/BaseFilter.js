@@ -11,16 +11,12 @@ var BaseFilter = new Class("Filter");
 var self = BaseFilter;
 
 BaseFilter.prepare = function (req, res, cb){
-	req._time = misc.now();
-
-	//url.parse('http://' + req.url);
-	self.debug(req.method, req.url, req.port);
-	// if (!_.isEmpty(req.body)){
-	// 	self.debug("Body ", JSON.stringify(req.body));
-	// }
+	self.debug(req.method, req.port, req.url);
 
 	var lang = req.param("lang");
 	req.locale = (lang)?lang:'en';
+	req._time = misc.now();
+
 	cb();
 };
 
@@ -71,12 +67,12 @@ BaseFilter.extendRequest = function(req, res, cb) {
 }
 
 function _afterLog(req, res, cb){
+	req._time = misc.now() - req._time;
+	self.debug(">>> time spent: " + req._time );
 	cb();	
 };
 
 function _afterDestroy(req, res, cb){
-	req._time = misc.now() - req._time;
-	self.debug(">>> time spent: " + req._time );
 
 	req._time = null;
 	req.sid = null;
@@ -232,21 +228,20 @@ BaseFilter.isSwitchedOn = function(req, res, cb) {
 	// need to investigate why hgetall and hmset doesnt work out any more.
 	self.series({
 		queryCache: function (next) {
-			global.cache.get(Const.cache.worlds, function(err, obj){
-				next(null, obj);
-			});
+			global.cache.get(Const.cache.worlds, next);
 		},
 		queryDb: function (next, _data) {
 			if (_data.queryCache){
-				next(null, _data.queryCache);
-			}else {
-				World.getAll(function (err, result){
-					var _result = JSON.stringify(result);
-					global.cache.set(Const.cache.worlds, _result, function(){
-						next(null, _result);
-					});
-				});
+				return next(null, _data.queryCache);
 			}
+
+			World.getAll(function (err, result){
+				var _result = JSON.stringify(result);
+				global.cache.set(Const.cache.worlds, _result, function(){
+					next(null, _result);
+				});
+			});
+
 		},
 		querySwitch: function(next, _data) {
 			var worlds = JSON.parse(_data.queryDb);
@@ -260,7 +255,7 @@ BaseFilter.isSwitchedOn = function(req, res, cb) {
 		}
 	}, function(err, _data){
 		if (err) return cb(err);
-		
+
 		switch (_data.querySwitch) {
 			// if switch == 0, welcome all;
 			case 0: cb(); break;
@@ -293,12 +288,8 @@ BaseFilter.isSwitchedOn = function(req, res, cb) {
 };
 
 BaseFilter.isBanned = function(req, res, cb) {
-	if (req.gameUser) {
-		if (req.gameUser.banned){
-			cb("USER_BANNED");
-		}
-	}else {
-		cb("USER_NONE");
+	if (req.gameUser.banned){
+		return cb("USER_BANNED");
 	}
 	cb();
 };

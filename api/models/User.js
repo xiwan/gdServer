@@ -17,10 +17,12 @@ var _fields = {
     { type: 'integer', defaultsTo: 50, },
   ipAddr:           // user ip address
     { type: 'string', defaultsTo: '127.0.0.1', },
-  city:             // user city
-    { type: 'string', defaultsTo: 'unkown', },
-  country:          // user country
-    { type: 'string', defaultsTo: 'unkown', },
+  address: 
+    { type: 'json', defaultsTo: {street: 'unkonw', city: 'unkown', country: 'unkonw'}},
+  // city:             // user city
+  //   { type: 'string', defaultsTo: 'unkown', },
+  // country:          // user country
+  //   { type: 'string', defaultsTo: 'unkown', },
   banned:           // banned flag
     { type: 'boolean', defaultsTo: false, },
   tutorial:         // is a tutorial player?

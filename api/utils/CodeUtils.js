@@ -1,5 +1,8 @@
 
 var util = require('util');
+var rtnCodes = require('../Const').rtnCodes;
+
+module.exports = CodeUtils;
 
 function CodeUtils(res, code, params) {
 
@@ -16,7 +19,7 @@ function CodeUtils(res, code, params) {
   }
 
   var codeMsg = {};
-  codeMsg.code = CodeUtils[code]||CodeUtils.NORMAL;
+  codeMsg.code = CodeUtils.rtnCodes[code]||200;
   //codeMsg.data = null;
   if (params){
     codeMsg.message = res.i18n.apply(this, [codeMsg.code].concat(params));
@@ -25,9 +28,9 @@ function CodeUtils(res, code, params) {
     codeMsg.message  = res.i18n(codeMsg.code);
   }
   return codeMsg;
-}
+};
 
-module.exports = CodeUtils;
+CodeUtils.rtnCodes = rtnCodes;
 
 function _codeError(name, message) {
   // in production mode, should disable this error stack 
@@ -49,7 +52,6 @@ function BadRequestError(name, message) {
 }
 
 util.inherits(BadRequestError, Error);
-
 
 function ForbiddenError(name, message) {
   _codeError.apply(this, arguments);
@@ -74,42 +76,6 @@ function ServiceUnavailableError(name, message) {
 }
 
 util.inherits(ServiceUnavailableError, Error);
-
-
-/*
-  ATTENTION: the suffix number identify how many parameters need to be passed.
-  Thus, this how we call it:
-      var msg = CodeUtils(res, msgUtils.PASSWORD_NOT_MATCHED, [password, rptpassword]);
-*/
-
-CodeUtils.PASSWORD_NOT_MATCHED = 100;
-CodeUtils.PASSWORD_INVALID = 101;
-
-CodeUtils.USER_INVALID = 110;
-CodeUtils.USER_DUPLICATE = 111;
-CodeUtils.USER_NONE = 112;
-CodeUtils.USER_SESSION_SET_ERROR = 113;
-CodeUtils.USER_BANNED = 114;
-
-CodeUtils.WORLD_DUPLICATE = 120;
-CodeUtils.WORLD_NONE = 121;
-CodeUtils.WORLD_CREATE_FAIL = 122;
-CodeUtils.WORLD_POPULATION_BOOM = 123;
-
-CodeUtils.MISS_VERSION = 1000;
-CodeUtils.CONFLICT_VERSION = 1001;
-
-CodeUtils.AUTH_NO_SID = 1011;
-CodeUtils.AUTH_BAD_SID= 1012;
-CodeUtils.AUTH_EXPIRED_SID = 1013;
-CodeUtils.AUTH_USER_NONE = 1014;
-
-CodeUtils.NORMAL = 200;
-CodeUtils.BAD_REQUEST = 400;
-CodeUtils.FORBIDDEN = 403;
-CodeUtils.NOT_FOUND = 404;
-CodeUtils.ERROR_INTERNAL = 500;
-CodeUtils.SERVICE_UNAVAILABLE = 503;
 
 // function array_merge() {
 //   //   example 1: arr1 = {"color": "red", 0: 2, 1: 4}

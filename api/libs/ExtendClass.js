@@ -19,8 +19,7 @@ function prependClassName(classname, args) {
   return _results;
 }
 
-ExtendClass.prototype.info = function() {
-	//logger.info.apply(logger, arguments);		
+ExtendClass.prototype.info = function() {		
   sails.log.info.apply(this, prependClassName(this.classname, _.toArray(arguments)));
 };
 
@@ -29,8 +28,6 @@ ExtendClass.prototype.debug = function() {
 };
 
 ExtendClass.prototype.warn = function() {
-	// logger.level(this.classname + " warn");
-	// logger.warn.apply(logger, arguments);	
   sails.log.warn.apply(this, prependClassName(this.classname, _.toArray(arguments)));	
 };
 

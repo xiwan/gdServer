@@ -106,7 +106,7 @@ World.updateByPort = function(update, port, cb) {
       world.ipAddr = misc.getExternalIp();
       world.nodeEnv = process.env.NODE_ENV;
       world.updatedAt = misc.now();
-      console.log(world)
+
       world.save(function(err){
         cb(err, world);
       });

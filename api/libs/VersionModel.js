@@ -26,6 +26,14 @@ module.exports = (function(){
 			this.version = v;
 		};
 
+		_VersionModel.findCache = function(key){
+
+		};
+
+		_VersionModel.findLocalCache = function(key){
+
+		};
+
 		// attributes merge
 		if (attributes){
 			_.extend(_VersionModel.attributes, attributes);
