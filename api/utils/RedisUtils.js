@@ -1,7 +1,7 @@
 
 var util = require('util');
 var redis = require('redis');
-var Class = require('./ClassUtils');
+var Class = require('../libs/ExtendClass');
 
 
 module.exports = RedisUtils;

@@ -2,8 +2,7 @@
 var util = require('util');
 var misc = require('../utils/MiscUtils');
 var crypt = require('../utils/CryptUtils');
-//var RedisUtils = require('../utils/RedisUtils');
-var BaseService = require('./BaseService');
+var BaseService = require('../libs/BaseService');
 
 var SessionService = BaseService.extend("SessionService");
 var self = SessionService;
@@ -25,7 +24,10 @@ SessionService.create = function(username, cb){
 		// now we have to store the sessionId and sessionToken pair into redis/db
 		// and the return the sessionId to the client side; {sid: xxxxxxx}
 		function(user, next) {
-			global.cache.set(sessionid, sessionToken, next);
+			var expire = misc.now() + 7200;
+			global.cache.hmset(sessionid, {"session": sessionToken, "expire": expire}, next);
+			//global.cache.hgetall(sessionid, next);
+			//global.cache.set(sessionid, sessionToken, next);
 		}
 	], function(err, data) {
 		if (err) {
@@ -41,7 +43,7 @@ SessionService.refresh = function(sid, username, worldname, cb){
 	var sessionid;
 	self.waterfall([
 		function(next){
-			global.cache.get(sid, next)
+			global.cache.hgetall(sid, next)
 		},
 		function(session, next){
 			if (!session){
@@ -65,7 +67,14 @@ SessionService.refresh = function(sid, username, worldname, cb){
 		// now we have to store the sessionId and sessionToken pair into redis/db
 		// and the return the sessionId to the client side; {sid: xxxxxxx}
 		function(user, next) {
-			global.cache.set(sessionid, sessionToken, next);
+			if (user) {
+				var expire = misc.now() + 7200;
+				global.cache.hmset(sessionid, {"session": sessionToken, "expire": expire}, next);
+			}else {
+				next("USER_SESSION_SET_ERROR");
+			}
+			//global.cache.hgetall(sessionid, next);
+			//global.cache.set(sessionid, sessionToken, next);
 		}
 	], function(err, data){
 		if (err) return cb(err);
@@ -76,17 +85,17 @@ SessionService.refresh = function(sid, username, worldname, cb){
 }
 
 // if the user not login to world, the format is: val:now:expire;
-// otherwise the format is: world:val:now:expire
-// every user/account can only have one session at the same moment;
+// otherwise the format is: world:val:now
+// every user/account can only have one session at the same time;
 function _build (val1, val2) {
 	var now = misc.now();
-	var expire = now + 3600;
+	//var expire = now + 7200;
 	if (val1 && val2){
-		return val1 + ":" + val2 + ":" + now + ":" + expire;
+		return val1 + ":" + val2 + ":" + now;
 	}
 
 	if (val2){
-		return val2 + ":" + now + ":" + expire;
+		return val2 + ":" + now;
 	}	
 }
 

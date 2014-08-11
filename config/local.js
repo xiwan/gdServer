@@ -24,7 +24,6 @@
 'use strict';
 
 var fs = require('fs');
-var logger = require('../api/utils/LoggerUtils');
 var defaults = require('./env/defaults');
 
 module.exports = (function(){
@@ -33,9 +32,9 @@ module.exports = (function(){
 
   if (fs.existsSync(envConfigPath)) {
     var env = require(envConfigPath).env;
-    logger.info('Loaded environment config for ' + defaults.environment + '.');
+    //console.log('Loaded environment config for ' + defaults.environment + '.');
   }else {
-    logger.info('Environment config for ' + defaults.environment +' not found.');
+    console.log('Environment config for ' + defaults.environment +' not found.');
   }
   return env;
 }());

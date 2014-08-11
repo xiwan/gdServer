@@ -1,15 +1,25 @@
 
 var util = require('util');
+var rtnCodes = require('../Const').rtnCodes;
 
 module.exports = CodeUtils;
 
 function CodeUtils(res, code, params) {
-  if (code instanceof Error){
-    return new CodeError(code, "ERROR_INTERNAL");
+
+  if (code == "BAD_REQUEST" || code instanceof BadRequestError){
+    return new BadRequestError("BAD_REQUEST", code);
+  }else if (code == "FORBIDDEN" || code instanceof ForbiddenError){
+    return new ForbiddenError("FORBIDDEN", code);
+  }else if (code == "NOT_FOUND" || code instanceof NotFoundError){
+    return new NotFoundError("NOT_FOUND", code);
+  }else if (code == "SERVICE_UNAVAILABLE" || code instanceof ServiceUnavailableError ){
+    return new ServiceUnavailableError("SERVICE_UNAVAILABLE", code);
+  }else if (code == "ERROR_INTERNAL" || code instanceof InternalError || code instanceof Error){
+    return new InternalError("ERROR_INTERNAL", code);
   }
 
   var codeMsg = {};
-  codeMsg.code = CodeUtils[code]||CodeUtils.NORMAL;
+  codeMsg.code = CodeUtils.rtnCodes[code]||200;
   //codeMsg.data = null;
   if (params){
     codeMsg.message = res.i18n.apply(this, [codeMsg.code].concat(params));
@@ -18,60 +28,54 @@ function CodeUtils(res, code, params) {
     codeMsg.message  = res.i18n(codeMsg.code);
   }
   return codeMsg;
-}
+};
 
-function CodeError(message, code) {
+CodeUtils.rtnCodes = rtnCodes;
+
+function _codeError(name, message) {
   // in production mode, should disable this error stack 
   // possibly insecure
   Error.call(this, message);
-  Error.captureStackTrace(this, CodeError);
+  Error.captureStackTrace(this, this.constructor);
 
-  //this.name = code;
-  this.code = CodeUtils[code];
-  this.message = code + " : " + message;
+  this.name = name;
+  this.code = CodeUtils[name];
+  this.message = "" + message;
 
   if (this.stack && this.stack.length) {
     console.log(this.stack);
   }
 }
 
-util.inherits(CodeError, Error);
+function BadRequestError(name, message) {
+  _codeError.apply(this, arguments);
+}
 
-/*
-  ATTENTION: the suffix number identify how many parameters need to be passed.
-  Thus, this how we call it:
-      var msg = CodeUtils(res, msgUtils.PASSWORD_NOT_MATCHED, [password, rptpassword]);
-*/
+util.inherits(BadRequestError, Error);
 
-CodeUtils.PASSWORD_NOT_MATCHED = 100;
-CodeUtils.PASSWORD_INVALID = 101;
+function ForbiddenError(name, message) {
+  _codeError.apply(this, arguments);
+}
 
-CodeUtils.USER_INVALID = 110;
-CodeUtils.USER_DUPLICATE = 111;
-CodeUtils.USER_NONE = 112;
-CodeUtils.USER_SESSION_SET_ERROR = 113;
-CodeUtils.USER_BANNED = 114;
+util.inherits(ForbiddenError, Error);
 
-CodeUtils.WORLD_DUPLICATE = 120;
-CodeUtils.WORLD_NONE = 121;
-CodeUtils.WORLD_CREATE_FAIL = 122;
-CodeUtils.WORLD_POPULATION_BOOM = 123;
+function NotFoundError(name, message) {
+  _codeError.apply(this, arguments);
+}
 
-CodeUtils.MISS_VERSION = 1000;
-CodeUtils.CONFLICT_VERSION = 1001;
+util.inherits(NotFoundError, Error);
 
-CodeUtils.AUTH_NO_SID = 1011;
-CodeUtils.AUTH_BAD_SID= 1012;
-CodeUtils.AUTH_EXPIRED_SID = 1013;
-CodeUtils.AUTH_USER_NONE = 1014;
+function InternalError(name, message) {
+  _codeError.apply(this, arguments);
+}
 
-CodeUtils.SERVICE_UNAVAILABLE = 1015;
+util.inherits(InternalError, Error);
 
-CodeUtils.NORMAL = 200;
-CodeUtils.BAD_REQUEST = 400;
-CodeUtils.FORBIDDEN = 403;
-CodeUtils.NOT_FOUND = 404;
-CodeUtils.ERROR_INTERNAL = 500;
+function ServiceUnavailableError(name, message) {
+  _codeError.apply(this, arguments);
+}
+
+util.inherits(ServiceUnavailableError, Error);
 
 // function array_merge() {
 //   //   example 1: arr1 = {"color": "red", 0: 2, 1: 4}

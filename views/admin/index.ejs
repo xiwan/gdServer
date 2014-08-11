@@ -1,6 +1,80 @@
 <div class="container clearfix">
 
 <h2>admin site</h2>
+
+<hr />
+<h3>world list</h3>
+
+<table id="worldListTable" border="1">
+	<tr>
+		<td>name</td>
+		<td>ipAddr</td>
+		<td>port</td>
+		<td>delay</td>
+		<td>population</td>
+		<td>capacity</td>
+		<td>switch</td>
+		<td>entryLevel</td>
+		<td>nodeEnv</td>
+		<td>status</td>
+	</tr>
+	<% for (var i=0; i<data.length; i++) { %>
+	<tr>
+		<td> <a href="#"><%= data[i].name %></a> </td>
+		<td> <%= data[i].ipAddr %> </td>
+		<td> <%= data[i].port %> </td>
+		<td> <%= data[i].delay %> </td>
+		<td> <%= data[i].population %> </td>
+		<td> <%= data[i].capacity %> </td>
+		<td> 
+			<select name="switchSelect" data-world="<%= data[i].name %>" data-port="<%= data[i].port %>">
+				<option value="0" <% if (data[i].switch=="0"){ %> 
+					selected='selected'
+				<% }%>>0: normal</option>
+				<option value="1" <% if (data[i].switch=="1"){ %> 
+					selected='selected'
+				<% }%>>1: block newbies</option>
+				<option value="2" <% if (data[i].switch=="2"){ %> 
+					selected='selected'
+				<% }%>>2: block entrance</option>
+				<option value="3" <% if (data[i].switch=="3"){ %> 
+					selected='selected'
+				<% }%>>3: disabled</option>
+			</select> 
+		</td>
+		<td> <%= data[i].entryLevel %> </td>
+		<td> <%= data[i].nodeEnv %> </td>
+		<td> running/stopped </td>
+	</tr>
+	<% } %>
+</table>
+
+<script type='text/javascript'>
+	$("select[name='switchSelect']").change(function(){
+		var that = this;
+		var answer = confirm("Do you want to change the status?");
+		if (answer) {
+			$.ajax({
+				type: 'POST',
+				url: '<%= prefx %>/admin/world/switch',
+				data: {
+					name: $(that).attr("data-world"), 
+					port: $(that).attr("data-port"), 
+					'switch': $(that).val(), 
+				},
+				success: function(data){
+					alert('ok');
+				},
+				error: function(){
+					alert('error');
+				}
+			});
+		}
+
+	});
+
+</script>
+
 <hr />
 <h3>world register</h3>
 	<form id="worldCreateForm" >
@@ -16,7 +90,7 @@
 	$("#worldCreateBtn").click(function(){
 		$.ajax({
 			type: 'POST',
-			url: '/admin/world/create',
+			url: '<%= prefx %>/admin/world/create',
 			data: {
 				name: $("#worldCreateForm").find("input[name='name']").val(), 
 				port: $("#worldCreateForm").find("input[name='port']").val(), 

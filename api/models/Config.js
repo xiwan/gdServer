@@ -1,14 +1,19 @@
 'use strict';
 
-var BaseModel = require('./BaseModel');
+var BaseModel = require('../libs/BaseModel');
 
 var _fields = {
-		key: { type: 'string', maxLength: 32, minLength: 4, required: true, },
-		value: { type: 'string', maxLength: 128, required: true, },
+		key: 
+			{ type: 'string', maxLength: 32, minLength: 4, required: true, },
+		value: 
+			{ type: 'string', maxLength: 128, required: true, },
 };
 
-var Config = BaseModel.extend(_fields);
+var Config = BaseModel.extend(_fields, "mongo_gdHub");
 Config.classname = "Config";
+var self = Config;
+delete Config.createdAt;
+delete Config.updatedAt;
 
 Config.getOne = function(key, cb){
 	this

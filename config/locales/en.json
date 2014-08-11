@@ -19,12 +19,11 @@
 	"1012": "bad sid.",
 	"1013": "sid expired.",
 	"1014": "no sid user found.",
-
-	"1015": "service unavailable.",
 	
 	"200": "ok",
 	"400": "bad request",
 	"403": "forbidden",
 	"404": "not found",
-	"500": "internal error"
+	"500": "internal error",
+	"503": "service unavailable."
 }

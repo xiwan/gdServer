@@ -9,6 +9,7 @@
  */
 
 var redisUtils = require('../api/utils/RedisUtils');
+var misc = require('../api/utils/MiscUtils');
 
 //var World = require('../api/models/World');
 
@@ -25,7 +26,7 @@ module.exports.bootstrap = function (cb) {
   if (env.redis) {
   	redisInit(env.redis);
   }else if (env.memcached) {
-  	
+  	// no memcached
   }else {
   	sails.log.warn("no cache found!");
   }
@@ -34,27 +35,32 @@ module.exports.bootstrap = function (cb) {
 };
 
 function registerWorld(cb){
-  var _name = sails.config[process.env.NODE_ENV].env.name;
-  var _port = sails.config[process.env.NODE_ENV].env.port;
-  var _cap = sails.config[process.env.NODE_ENV].env.cap;
-  
+
+  var nodeEnv = process.env.NODE_ENV;
+
+  var _name = sails.config[nodeEnv].env.name;
+  var _port = sails.config[nodeEnv].env.port;
+  var _cap = sails.config[nodeEnv].env.cap;
+
+
+  // admin site no need to register
+  if (nodeEnv.indexOf('admin') > -1){
+    return cb();
+  }
+
   async.waterfall([
     function(next){
       World.getOne(null, _port, next);
     },
     function(world, next){
       if (world) {
-        if (world.name != _name) {
           World.updateByPort({name: _name}, _port, next);
-        }else {
-          next(null, world);
-        }
       }else {
         World.createOne(_name, _port, _cap, next);
       }
     }
   ], function (err, world) {
-    if(err) return cb(err);
+    if(err) return sails.log.error(err);
     cb();
   });
 }

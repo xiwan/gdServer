@@ -26,28 +26,60 @@
  *
  */
 
-module.exports.routes = {
+'use strict';
+
+var fs = require('fs');
+var _ = require('lodash');
+var local = require('./local');
+
+module.exports.routes = (function(){
+  var _routes = {};
+  var _router = local.router;
+
+  function prefixAdd (_router_) {
+    if (_router_.prefix) {
+      var prefix = _router_.prefix;
+      global.prefix = prefix;
+      delete _router_.prefix;
+      
+      var _router = {};
+      var keys = _.keys(_router_);
+      _.forEach(keys, function(num){
+        _router[_trim(num.replace(/^\/|\ \//, ' ' + prefix + '/'))] = _router_[num];
+      }); 
+      return _router;  
+    }
+    return _router_;
+  } 
+
+  function _trim(str) {
+    return str.replace(/^\s+|\s+$/g, '');
+  }   
+
+  if (_.isArray(_router)){
+    for(var i = 0; i<_router.length; i++){
+      if (fs.existsSync(__dirname + '/routes/' + _router[i] + '.js')){
+        var _router_ = require('./routes/' + _router[i]);
+        _.assign(_routes, prefixAdd(_router_));
+      }
+    }
+  }else if (_.isString(_router)){
+    if (fs.existsSync(__dirname + '/routes/' + _router + '.js')){
+      var _router_ = require('./routes/' + _router);
+      _.assign(_routes, prefixAdd(_router_));
+    }
+  }else {
+    console.log(" no routes specified.");
+  }
+  
+  return _routes;
+}());
+
 
   // By default, your root route (aka home page) points to a view
   // located at `views/home/index.ejs`
   // 
   // (This would also work if you had a file at: `/views/home.ejs`)
-  '/gate': {
-    view: 'gate/index'
-  },
-
-  'post /gate/user/login': 'GateController.userLogin',
-  'post /gate/user/create': 'GateController.userCreate',
-  'post /gate/user/weak': 'GateController.userWeak',
-
-  'get /gate/world/list': 'GateController.worldList',
-  'post /gate/world/choose': 'GateController.worldChoose',
-
-  '/admin': {
-    view: 'admin/index',
-  },
-  'get /admin/world/list': 'AdminController.worldList',
-  'post /admin/world/create': 'AdminController.worldCreate',
 
   /*
   // But what if you want your home page to display
@@ -106,7 +138,6 @@ module.exports.routes = {
   'get /*(^.*)': 'UserController.profile'
 
   */
-};
 
 
 

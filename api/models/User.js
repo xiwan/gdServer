@@ -2,20 +2,39 @@
 
 var crypt = require('../utils/CryptUtils');
 var misc = require('../utils/MiscUtils');
-var BaseModel = require('./BaseModel');
+var BaseModel = require('../libs/BaseModel');
 
 var _fields = {
-  username: { type: 'string', maxLength: 32, minLength: 4, required: true, },
-  sid: { type: 'string', maxLength: 32, defaultsTo: 'unkown', },
-  password: { type: 'string', maxLength: 32, minLength: 8, required: true, },
-  phoneNumber: { type: 'string', required: true, },
-  world: { type: 'string', minLength: 4, maxLength: 32, defaultsTo: 'unkown', },
-  ipAddr: { type: 'string', defaultsTo: '127.0.0.1', },
-  city: { type: 'string', defaultsTo: 'unkown', },
-  country: { type: 'string', defaultsTo: 'unkown', },
-  banned: { type: 'boolean', defaultsTo: false, },
-  lastLoginWorld: { type: 'string', defaultsTo: 'unkown', },
-  lastLoginAt: 'integer',
+  username:         // username, primary key
+    { type: 'string', minLength: 4, maxLength: 32, required: true, },
+  sid:              // user sid
+    { type: 'string', maxLength: 32, defaultsTo: 'unkown', },
+  password:         // password
+    { type: 'string', minLength: 8, maxLength: 32, required: true, },
+  phoneNumber:      // phone number
+    { type: 'string', required: true, },
+  maxFriend:        // limitation of friend        
+    { type: 'integer', defaultsTo: 50, },
+  ipAddr:           // user ip address
+    { type: 'string', defaultsTo: '127.0.0.1', },
+  address: 
+    { type: 'json', defaultsTo: {street: 'unkonw', city: 'unkown', country: 'unkonw'}},
+  // city:             // user city
+  //   { type: 'string', defaultsTo: 'unkown', },
+  // country:          // user country
+  //   { type: 'string', defaultsTo: 'unkown', },
+  banned:           // banned flag
+    { type: 'boolean', defaultsTo: false, },
+  tutorial:         // is a tutorial player?
+    { type: 'integer', defaultsTo: 0, },
+  onMission:        // is on mission ?
+    {type: 'boolean', defaultsTo: false, },
+  characters:        // is on mission ?
+    {type: 'string', },
+  lastLoginWorld:   // last time where user played in
+    { type: 'string', defaultsTo: 'unkown', },
+  lastLoginAt:      // last time user login at
+    { type: 'integer', },
 
   toJSON: function(){
     var obj = this.toObject();
@@ -25,13 +44,13 @@ var _fields = {
   },
 };
 
-var User = BaseModel.extend(_fields, "User");
+var User = BaseModel.extend(_fields, "mongo_gdHub");
+User.classname = "User";
 var self = User; //Attention: this and self are not same object
 
 // Lifecycle callback
 User.beforeCreate = function(values, next){
   crypt.md5(values.password, null, function(err, hash){
-    //User.debug(hash);
     if(err) return next(err);
     var now = misc.now();
     values.lastLoginAt = now;
@@ -47,7 +66,7 @@ User.createOne = function(username, phoneNumber, password, cb) {
 		.create({
       username: username,
       phoneNumber: phoneNumber || '111-222-333',
-      password: password || '12345678',
+      password: password,
       banned: false,
     })
 		.done(function(err, user){
@@ -73,6 +92,7 @@ User.updateWorld = function(username, worldname, cb) {
     .findOneByUsername(username)
     .then(function(user){
       user.lastLoginWorld = worldname;
+      user.lastLoginAt = misc.now();
       user.updatedAt = misc.now();
       user.save(function(err){
         cb(err, user);

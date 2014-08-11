@@ -1,7 +1,7 @@
 
 'use strict';
 
-var BaseController = require('./BaseController');
+var BaseController = require('../libs/BaseController');
 
 var GateController = BaseController.extend("GateController");
 var self = GateController;
@@ -72,6 +72,7 @@ GateController.worldList = function(req, res) {
 
 GateController.worldChoose = function(req, res) {
 	var worldname = req.param('name');
+	// could retrieve port number through request
 	var port = _.parseInt(req.param('port'));
 	var sid = req.sid;
 	var username = req.gameUser.username;
