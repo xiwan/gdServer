@@ -36,6 +36,7 @@ module.exports = (function(){
   }else {
     console.log('Environment config for ' + defaults.environment +' not found.');
   }
+
   return env;
 }());
 

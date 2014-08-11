@@ -14,7 +14,7 @@
 'use strict';
 
 var fs = require('fs');
-//var logger = require('../api/utils/LoggerUtils');
+var beautify = require('js-beautify').js_beautify;
 var defaults = require('./env/defaults');
 
 module.exports.adapters = (function(){
@@ -24,12 +24,21 @@ module.exports.adapters = (function(){
   if (fs.existsSync(envConfigPath)) {
     var database = require(envConfigPath).database;
     if (database[database.default] == null) {
-      logger.err("Config structure is invalid");
+      console.log("Config structure is invalid");
       throw new Error(" Config structure is invalid");
     }
-    //console.log('Loaded Database config for ' + defaults.environment + '.');
   }else {
     console.log('Database config for ' + defaults.environment +' not found.');
   }
+
+  var dbJsonFilePath = __dirname + "/env/json/" + process.env.NODE_ENV + ".json";
+  fs.writeFile(
+    dbJsonFilePath, 
+    beautify(JSON.stringify(database), { indent_size: 2 }), 
+    function(err){
+      if(err) throw err;
+      console.log('>>> ', dbJsonFilePath);
+    });
+
   return database;
 }());
