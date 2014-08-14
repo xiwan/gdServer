@@ -18,7 +18,7 @@ function injectPluginModels(connName, cb) {
     
     modelDefs: ['_loadModules', function(next){
       // 2. Merge additional models, exclude model in hub;
-      _.each(sails.models, function(pubginModel, key) {
+      _.each(sails.models, function(pubginModel) {
         if (pubginModel.connection === "mongo_gdHub") {
           return;
         }
@@ -128,7 +128,7 @@ function injectPluginModels(connName, cb) {
             }
             // assuming plugin.models holds array of models for this plugin
             // customize for your use case
-            
+
             injectPluginModels(connName, next); 
 	          
 

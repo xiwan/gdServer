@@ -44,7 +44,7 @@ var _fields = {
   },
 };
 
-var User = BaseModel.extend(_fields, "mongo_gdHub");
+var User = BaseModel.extend(_fields);
 User.classname = "User";
 var self = User; //Attention: this and self are not same object
 

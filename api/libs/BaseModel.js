@@ -6,15 +6,21 @@ var util = require('util');
 
 module.exports = (function(){
 
-	var BaseModel = {};
-
+	var BaseModel = {
+		conns: _.keys(sails.config.sys.database),
+	};
+	/*
+		connection: true = gdGame server; false = gdHub server
+	*/
 	BaseModel.extend = function(attributes, connection){
 
 		function _BaseModel(){
 			Class.apply(this, arguments);
 			this.classname = "BaseModel";
+
 			// use a different adapter
-			this.connection = connection;
+			var _conn = (connection)?1:0;
+			this.connection = BaseModel.conns[_conn];
 
 			this.autoCreatedAt = false;
 			this.autoUpdatedAt = false;

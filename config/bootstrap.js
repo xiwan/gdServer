@@ -8,41 +8,49 @@
  * http://sailsjs.org/#documentation
  */
 
+var fs = require('fs');
+var async = require('async');
+var beautify = require('js-beautify').js_beautify;
 var redisUtils = require('../api/utils/RedisUtils');
 var misc = require('../api/utils/MiscUtils');
 
 module.exports.bootstrap = function (cb) {
-
   // It's very important to trigger this callack method when you are finished 
   // with the bootstrap!  (otherwise your server will never lift, since it's waiting on the bootstrap)
 
-  if (!globalInit()){
-  	return;
-  }
-
   var sys = sails.config.sys;
 
-  if (sys.redis) {
-  	redisInit(sys.redis);
-  }else if (sys.memcached) {
-  	// no memcached
-  }else {
-  	sails.log.warn("no cache found!");
-  }
+  async.series({
+    envCheck: function(next) {
+      if (!process.env.NODE_ENV) return next(' >>> no `NODE_ENV` !!!');
+      next();
+    },
 
-  registerWorld(cb);
+    redisInit: function (next) {
+      redisInit(sys.redis, next);
+    },
+
+    jsonOutput: function(next) {
+      jsonOutput(sys.database, next);
+    },
+
+    worldRegist: function (next) {
+      worldRegist(sys.env.name, sys.env.port, sys.env.cap, next);
+    },
+
+
+  }, function (err, data){
+    if (err) return cb(err);
+    sails.log.warn("bootstrap ok!");
+    cb();
+  });
+
 };
 
-function registerWorld(cb){
+function worldRegist(name, port, cap, cb){
 
   var nodeEnv = process.env.NODE_ENV;
-
-  var _name = sails.config.sys.env.name;
-  var _port = sails.config.sys.env.port;
-  var _cap = sails.config.sys.env.cap;
-
-  sails.config.sys.database.keys = _.keys(sails.config.sys.database);
-
+  
   // admin site no need to register
   if (nodeEnv.indexOf('admin') > -1){ 
     return cb();
@@ -50,32 +58,35 @@ function registerWorld(cb){
 
   async.waterfall([
     function(next){
-      World.getOne(null, _port, next);
+      World.getOne(null, port, next);
     },
-    function(world, next){
-      if (world) {
-          World.updateByPort({name: _name}, _port, next);
+    function(data, next){
+      if (data) {
+        World.updateByPort({name: name}, port, next);
       }else {
-        World.createOne(_name, _port, _cap, next);
+        World.createOne(name, port, cap, next);
       }
     }
-  ], function (err, world) {
-    if(err) return sails.log.error(err);
-    cb();
+  ], function (err, data) {
+    cb(err);
   });
 }
 
-
-function globalInit(){
-	if (!global){
-      sails.log.warn('global object not be running!!!');
-      return false;
-	}
-	return true;
+function jsonOutput(database, cb) {
+  // store connenctions
+  database.conns = _.keys(database);
+  // output to json file  
+  fs.writeFile(
+    __dirname + "/env/jsons/" + process.env.NODE_ENV + ".json", 
+    beautify(JSON.stringify(database), { indent_size: 2 }), 
+    function(err){
+      if(err) throw err;
+      sails.log.warn('>>> ', process.env.NODE_ENV + ".json");
+      cb();
+    });
 }
 
-
-function redisInit(config) {
+function redisInit(config, cb) {
 	var redis = new redisUtils(config.port, config.host);
 
 	// bind the client to global cache;
@@ -89,7 +100,8 @@ function redisInit(config) {
         '\n=========================================================');
     }
 
-    redis.warn('redis is ready. ');
+    sails.log.warn('>>>  redis is ready. ');
+    cb(err);
 	});
 }
 

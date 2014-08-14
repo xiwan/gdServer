@@ -37,10 +37,9 @@ module.exports.sys = {
 	},
 
 	database: {
-		'default': 'mongo_gdHub',
 
 		mongo_gdHub: {
-			module: 'sails-mongo',
+			adapter: 'sails-mongo',
 	    user: 'gdHub',
 	    password: '1q2w3e4R',
 	    database: 'gdHub',
@@ -49,7 +48,7 @@ module.exports.sys = {
 		},
 
 		mongo_gdGame2: {
-			module: 'sails-mongo',
+			adapter: 'sails-mongo',
 	    user: 'gdGame2',
 	    password: '1q2w3e4R',
 	    database: 'gdGame2',

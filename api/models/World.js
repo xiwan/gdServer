@@ -24,7 +24,7 @@ var _fields = {
   	{ type: 'string',  minLength: 4, maxLength: 32, },
 };
 
-var World = BaseModel.extend(_fields, "mongo_gdHub");
+var World = BaseModel.extend(_fields);
 
 World.classname = "World";
 var self = World;

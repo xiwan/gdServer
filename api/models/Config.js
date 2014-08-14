@@ -9,11 +9,11 @@ var _fields = {
 			{ type: 'string', maxLength: 128, required: true, },
 };
 
-var Config = BaseModel.extend(_fields, "mongo_gdGame2");
+var Config = BaseModel.extend(_fields, true);
 Config.classname = "Config";
 var self = Config;
-delete Config.createdAt;
-delete Config.updatedAt;
+delete Config.attributes.createdAt;
+delete Config.attributes.updatedAt;
 
 Config.getOne = function(key, cb){
 	this

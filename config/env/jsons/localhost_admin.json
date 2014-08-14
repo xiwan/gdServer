@@ -1,0 +1,72 @@
+{
+  "mongo_gdHub": {
+    "adapter": "sails-mongo",
+    "user": "gdHub",
+    "password": "1q2w3e4R",
+    "database": "gdHub",
+    "schema": true,
+    "replSet": {
+      "servers": [{
+        "host": "localhost",
+        "port": 27017
+      }, {
+        "host": "localhost",
+        "port": 27018
+      }, {
+        "host": "localhost",
+        "port": 27019
+      }],
+      "options": {
+        "readPreference": "secondary",
+        "poolSize": 10
+      }
+    }
+  },
+  "mongo_gdGame1": {
+    "adapter": "sails-mongo",
+    "user": "gdGame1",
+    "password": "1q2w3e4R",
+    "database": "gdGame1",
+    "schema": true,
+    "replSet": {
+      "servers": [{
+        "host": "localhost",
+        "port": 27017
+      }, {
+        "host": "localhost",
+        "port": 27018
+      }, {
+        "host": "localhost",
+        "port": 27019
+      }],
+      "options": {
+        "readPreference": "secondary",
+        "poolSize": 10
+      }
+    }
+  },
+  "mongo_gdGame2": {
+    "adapter": "sails-mongo",
+    "user": "gdGame2",
+    "password": "1q2w3e4R",
+    "database": "gdGame2",
+    "schema": true,
+    "replSet": {
+      "servers": [{
+        "host": "localhost",
+        "port": 27017
+      }, {
+        "host": "localhost",
+        "port": 27018
+      }, {
+        "host": "localhost",
+        "port": 27019
+      }],
+      "options": {
+        "readPreference": "secondary",
+        "poolSize": 10
+      }
+    }
+  },
+  "conns": ["mongo_gdHub", "mongo_gdGame1", "mongo_gdGame2"]
+}

@@ -19,5 +19,5 @@ module.exports.models = {
   ***************************************************************************/
 
   connection: 'mongo_gdHub',
-  migrate: 'drop',
+  migrate: 'alter',
 };
