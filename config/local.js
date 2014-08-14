@@ -31,7 +31,7 @@ module.exports = (function(){
   var env = {};
 
   if (fs.existsSync(envConfigPath)) {
-    var env = require(envConfigPath).env;
+    var env = require(envConfigPath).sys.env;
     //console.log('Loaded environment config for ' + defaults.environment + '.');
   }else {
     console.log('Environment config for ' + defaults.environment +' not found.');
@@ -39,7 +39,6 @@ module.exports = (function(){
 
   return env;
 }());
-
 
 
 // module.exports = {

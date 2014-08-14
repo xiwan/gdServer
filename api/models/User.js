@@ -51,6 +51,7 @@ var self = User; //Attention: this and self are not same object
 // Lifecycle callback
 User.beforeCreate = function(values, next){
   crypt.md5(values.password, null, function(err, hash){
+    
     if(err) return next(err);
     var now = misc.now();
     values.lastLoginAt = now;
@@ -69,7 +70,7 @@ User.createOne = function(username, phoneNumber, password, cb) {
       password: password,
       banned: false,
     })
-		.done(function(err, user){
+		.exec(function(err, user){
 			if(err) return cb(err);
 			cb(null, user);
 		});
@@ -104,7 +105,7 @@ User.getOne = function(username, cb){
   this
     .findOne()
     .where({username: username})
-    .done(function(err, user){
+    .exec(function(err, user){
       if(err) return cb(err);
       if (user){
         user = user.toJSON();
@@ -123,7 +124,7 @@ User.getOneByUserAndPass = function(username, password, cb) {
       that
         .findOne()
         .where({username: username, password: hash})
-        .done(next);
+        .exec(next);
     }
   ], function(err, user) {
     if(err) return cb(err);
@@ -144,7 +145,7 @@ User.getOneByUserAndWorld = function(username, worldname, cb) {
   this
     .findOne()
     .where(where)
-    .done(function(err, user){
+    .exec(function(err, user){
       if(err) return cb(err);
       if (user){
         user = user.toJSON();

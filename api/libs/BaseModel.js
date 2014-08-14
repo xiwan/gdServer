@@ -8,13 +8,13 @@ module.exports = (function(){
 
 	var BaseModel = {};
 
-	BaseModel.extend = function(attributes, adapter){
+	BaseModel.extend = function(attributes, connection){
 
 		function _BaseModel(){
 			Class.apply(this, arguments);
 			this.classname = "BaseModel";
 			// use a different adapter
-			this.adapter = adapter;
+			this.connection = connection;
 
 			this.autoCreatedAt = false;
 			this.autoUpdatedAt = false;

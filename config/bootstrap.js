@@ -11,21 +11,20 @@
 var redisUtils = require('../api/utils/RedisUtils');
 var misc = require('../api/utils/MiscUtils');
 
-//var World = require('../api/models/World');
-
 module.exports.bootstrap = function (cb) {
 
   // It's very important to trigger this callack method when you are finished 
   // with the bootstrap!  (otherwise your server will never lift, since it's waiting on the bootstrap)
-  
+
   if (!globalInit()){
   	return;
   }
 
-  var env = sails.config[sails.config.environment];
-  if (env.redis) {
-  	redisInit(env.redis);
-  }else if (env.memcached) {
+  var sys = sails.config.sys;
+
+  if (sys.redis) {
+  	redisInit(sys.redis);
+  }else if (sys.memcached) {
   	// no memcached
   }else {
   	sails.log.warn("no cache found!");
@@ -38,13 +37,14 @@ function registerWorld(cb){
 
   var nodeEnv = process.env.NODE_ENV;
 
-  var _name = sails.config[nodeEnv].env.name;
-  var _port = sails.config[nodeEnv].env.port;
-  var _cap = sails.config[nodeEnv].env.cap;
+  var _name = sails.config.sys.env.name;
+  var _port = sails.config.sys.env.port;
+  var _cap = sails.config.sys.env.cap;
 
+  sails.config.sys.database.keys = _.keys(sails.config.sys.database);
 
   // admin site no need to register
-  if (nodeEnv.indexOf('admin') > -1){
+  if (nodeEnv.indexOf('admin') > -1){ 
     return cb();
   }
 
@@ -89,8 +89,8 @@ function redisInit(config) {
         '\n=========================================================');
     }
 
-    sails.log.info('redis is ready. ');
+    redis.warn('redis is ready. ');
 	});
-
 }
+
 

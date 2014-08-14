@@ -20,7 +20,7 @@ var _replSet = {
 	},
 };
 
-module.exports = {
+module.exports.sys = {
 
 	// do not change salt too often in production mode, 
 	// all logined user will be kicked out at ur own risk;

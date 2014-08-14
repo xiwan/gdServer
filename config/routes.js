@@ -71,7 +71,7 @@ module.exports.routes = (function(){
   }else {
     console.log(" no routes specified.");
   }
-  
+  // console.log(_routes);
   return _routes;
 }());
 
