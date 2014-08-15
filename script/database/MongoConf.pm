@@ -2,6 +2,7 @@ package MongoConf;
 
 use strict;
 use warnings;
+use Data::Dumper;
 use Parse::CPAN::Meta;
 
 sub load_mongo_conf {
@@ -13,7 +14,7 @@ sub load_mongo_conf {
 	}
 
 	unless ($confKey) {
-		$confKey = 'default';
+		$confKey = "mongo_gdHub";
 	}
 
 	my $conf = '';
@@ -21,11 +22,8 @@ sub load_mongo_conf {
 		$conf = $ENV{NODE_ENV} . '.json';
 	}
 
-	my $setting = Parse::CPAN::Meta->load_file( $path . $conf);
-	if ( $confKey eq 'default' ) {
-		$confKey = $setting -> {$confKey};
-	}
-
+	my $setting = Parse::CPAN::Meta->load_file( $path . $conf );
+	
 	my $found = 0;
 	for my $item ( keys %$setting ) {
 		if ( $item eq $confKey) {
@@ -39,20 +37,6 @@ sub load_mongo_conf {
 
 	return $setting -> {$confKey};
 
-	# my $client = MongoDB::MongoClient->new(
-	# 	host => 'mongodb://localhost:27017, localhost:27018, localhost:27019', 
-	# 	find_master => 1, 
-	# 	username => 'root', 
-	# 	password => '1q2w3e4R$', 
-	# 	db_name =>'admin');
-
-	# my $db = $client->get_database( 'gdHub' );
-	# my $users = $db->get_collection( 'user' );
-	# my $all_users = $users->find;
-	# print "mongo\n";
-	# while (my $doc = $all_users->next) {
-	# 	print $doc->{'password'}."\n";
-	# }
 };
 
 return 1;

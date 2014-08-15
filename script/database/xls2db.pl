@@ -19,28 +19,22 @@ use MongoConf;
 use ExcelParser;
 use Conf;
 
-our $CONFIG_PATH = "./config/env/json/";
+our $CONFIG_PATH = "./config/env/jsons/";
 
 # 設定
 our $SETTINGS = +{};
 
-load_mongo_conf();
-
 #########################
 
-our $DB_SETTINGS = $SETTINGS->{database};
+our $DB_SETTINGS = +{};
 our $COLUMN_TYPE = $Conf::COLUMN_TYPE;
 our $SHEET_MAPPING = $Conf::SHEET_MAPPING;
 
-our $dbh = MongoDB::MongoClient->new(
-	host => $SETTINGS->{host}, 
-	find_master => 1, 
-	username => $DB_SETTINGS->{user}, 
-	password => $DB_SETTINGS->{password}, 
-	db_name => $DB_SETTINGS->{database});
+our $dbh;
 
 sub load_mongo_conf {
 	my $setting = MongoConf::load_mongo_conf($CONFIG_PATH, @ARGV);
+
 	$SETTINGS->{database} = $setting;
 	my $servers = $SETTINGS->{database}->{replSet}->{servers};
 
@@ -48,7 +42,16 @@ sub load_mongo_conf {
 	for my $item (@$servers) {
 		$SETTINGS->{host} .= $item->{host}.':'.$item->{port}.', ';
 	}
-	# print $SETTINGS->{host};
+	# print $SETTINGS->{host}."\n";
+
+	$DB_SETTINGS = $SETTINGS->{database};
+
+	$dbh = MongoDB::MongoClient->new(
+		host => $SETTINGS->{host}, 
+		find_master => 1, 
+		username => $DB_SETTINGS->{user}, 
+		password => $DB_SETTINGS->{password}, 
+		db_name => $DB_SETTINGS->{database});
 }
 
 sub trim {
@@ -197,85 +200,103 @@ sub parse_books {
 }
 
 sub get_master_version {
-	my ($no_version, $no_insert) = @_;
-	my $master_version;
+	my ($no_version) = @_;
+	my $master_version = 0;
 
-	my $config = $dbh->get_database('gdHub')->get_collection('config');
-	my $current_version = $config->find( { key => 'v' } );
-	
+	my $masterVersion = $dbh->get_database($DB_SETTINGS->{database})->get_collection('masterversion');
+
+	unless($no_version) {
+		$masterVersion->update({},{'$inc' => { current => 1}});
+	}
+
+	my $current_version = $masterVersion->find();
 	while (my $doc = $current_version->next) {
-		print $doc->{value}."\n";
+		$master_version = $doc->{current};
 	}
 
 	return $master_version;
 }
 
+sub insert_database {
+	my ($table_name, $records, $version) = @_;
+
+	my $collection = $dbh->get_database($DB_SETTINGS->{database})->get_collection($table_name);
+
+	for my $r (@$records) {
+		$r->{'version'} = $version;
+		$collection->insert($r);
+	}
+
+}
+
+sub delete_database {
+	my ($table_name, $version) = @_;
+
+	my $collection = $dbh->get_database($DB_SETTINGS->{database})->get_collection($table_name);
+
+	$collection->remove({'version' => { '$lt' => $version}});
+}
+
 sub xls2db {
-	my ($filenames, $through_filter, $old_delete, $no_version, $no_insert, $check_db) = @_;
+	my ($filenames, $no_delete, $through_filter, $no_version, $no_insert) = @_;
 
-	# 全データ読み込み
+	# all data read
 	print "* Parse Excel.\n";
-	# my $parsed_data = parse_books($filenames, $through_filter);
+	my $parsed_data = parse_books($filenames, $through_filter);
 
-	# master_versionを振り出す
+	# master_version retrieval
 	print "* Get master version.\n";
-	my $master_version = get_master_version($no_version, $no_insert);
+	my $master_version = get_master_version($no_version);
 	die unless defined $master_version;
 	print "master version: $master_version\n";
+
+	# テーブル毎INSERT/DELETE
+	unless ($no_insert) {
+		print "* Insert new records.\n";
+		for my $table_name(keys %$parsed_data) {
+			insert_database($table_name, $parsed_data->{$table_name}, $master_version);
+		}
+	}
+	unless ($no_delete) {
+		print "* Delete old records.\n";
+		for my $table_name(keys %$parsed_data) {
+			delete_database($table_name, $master_version);
+		}
+	}
+
+	# commit チェック
+	print "* FINISHED\n";
 
 }
 
 sub main {
 	my $argv = shift;
-
-	my $old_delete = 0;
-	my $get_snapshot = 0;
+	
+	my $no_delete = 0;
 	my $through_filter = 0;
 	my $no_version = 0;
 	my $no_insert = 0;
-	my $check_db = 0;
 
 	GetOptionsFromArray($argv,
-		'delete|d' => \$old_delete,
+		'delete|d' => \$no_delete,
 		'through|t' => \$through_filter,
-		'snapshot|s' => \$get_snapshot,,
-		'version|n' => \$no_version,
+		'version|v' => \$no_version,
 		'insert|i' => \$no_insert,
-		'check|c' => \$check_db,
 	) or pod2usage(2) and exit(1);
 
 	if (scalar(@$argv) == 0) {
 		pod2usage(2);
 		exit(2);
+	}elsif (scalar(@$argv) == 1) {
+		$no_version = 1;
 	}
 
-	if ($old_delete && !$no_insert) {
-		if ($ENV{NODE_ENV} && $ENV{NODE_ENV} eq 'production') {
-			die "This script cannnot execute in production";
-		}
-	}
+	load_mongo_conf($argv->[0]);
 
-	if ($get_snapshot) {
-		print "== CREATE Excel file from database! ==\n";
-		# db2xls($argv->[0]);
-	} else {
-		if ($check_db) {
-			print "== Check master data ==\n";
-		} elsif ($old_delete) {
-			print "== INSERT new master and DELETE old master(s) ==\n";
-		} else {
-			print "== INSERT new master ==\n";
-		}
-		if ($check_db) {
-			# is check mode
-			$no_insert  = 1;
-			$no_version = 1;
-		}
-		my @files = ($argv->[1]) if ($argv->[1]);
-		push @files, $argv->[2] if ($argv->[2]);
-		push @files, $argv->[3] if ($argv->[3]);
-		xls2db(\@files, $through_filter, $old_delete, $no_version, $no_insert, $check_db);
-	}
+	my @files = ($argv->[1]) if ($argv->[1]);
+	push @files, $argv->[2] if ($argv->[2]);
+	push @files, $argv->[3] if ($argv->[3]);
+	xls2db(\@files, $no_delete, $through_filter, $no_version, $no_insert);
 }
 
 main(\@ARGV);
@@ -291,12 +312,9 @@ xls2db - Excel to BloodBrothers DB
 xls2db [database] [options] [file ...]
 
  Options:
-   -d, --delete:   delete old version records.
-   -t, --through:  through type filter(for using snapshot to db).
-   -s, --snapshot: create Excel from DB.
+   -d, --delete:  keep old version records.
    -v, --version: does not update version.
-   -i, --insert: does not insert data.
-   -c, --check: diff xls & db data.
+   -i, --insert: 	does not insert data.
 
 =head1 OPTIONS
 

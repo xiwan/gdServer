@@ -44,5 +44,6 @@
         "poolSize": 10
       }
     }
-  }
+  },
+  "conns": ["mongo_gdHub", "mongo_gdGame1"]
 }

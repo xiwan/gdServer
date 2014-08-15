@@ -211,9 +211,9 @@ BaseFilter.isValidVersion = function (req, res, cb) {
 				self.info(">>> version get form cache");
 				next(null, global.v);
 			} else {
-				Config.getOne("v", function(err, result) {
+				MasterVersion.getCurrent(function(err, v) {
 					self.info(">>> version get from db");
-					global.v = _.parseInt(result.value);
+					global.v = _.parseInt(v);
 					next(null, global.v);
 				});
 			}	

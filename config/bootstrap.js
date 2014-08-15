@@ -38,7 +38,6 @@ module.exports.bootstrap = function (cb) {
       worldRegist(sys.env.name, sys.env.port, sys.env.cap, next);
     },
 
-
   }, function (err, data){
     if (err) return cb(err);
     sails.log.warn("bootstrap ok!");

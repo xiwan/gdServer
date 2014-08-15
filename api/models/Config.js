@@ -9,7 +9,7 @@ var _fields = {
 			{ type: 'string', maxLength: 128, required: true, },
 };
 
-var Config = BaseModel.extend(_fields, true);
+var Config = BaseModel.extend(_fields);
 Config.classname = "Config";
 var self = Config;
 delete Config.attributes.createdAt;
