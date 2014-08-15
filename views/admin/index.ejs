@@ -75,34 +75,32 @@
 
 </script>
 
-<hr />
-<h3>world register</h3>
-	<form id="worldCreateForm" >
-		<div>name: <input name="name" value="" /> </div>
-		<div>port:<input name="port" value="" /> </div>
-		<div>capacity: <input name="capacity" value="" /> </div>
-		<div><input id="worldCreateBtn" type="button" value="create"/></div>
+	<hr />
+	<h3>master data upload</h3>
+	<form id="masterDataForm" >
+		<div>world: 
+			<select name="worldSelect">
+				<option value="0" > not selected </option>
+			<% for (var i=0; i<data.length; i++) { %>
+				<option value="1" > <%= data[i].name %> </option>
+			<% } %>
+			</select>
+		</div>
+
+		<div>metod: 
+			<select name="methodSelect">
+				<option value="0" > not selected </option>
+				<option value="1" > keep old </option>
+				<option value="2" > overwirte </option>
+			</select>
+		</div>
+
+		<div>file: <input type="file" name="name" value="" /> </div>
+		<div><input id="masterDataBtn" type="button" value="upload file"/></div>
 	</form>
 
+	<script type='text/javascript'>
+
+	</script>
+
 </div>
-
-<script type='text/javascript'>
-	$("#worldCreateBtn").click(function(){
-		$.ajax({
-			type: 'POST',
-			url: '<%= prefx %>/admin/world/create',
-			data: {
-				name: $("#worldCreateForm").find("input[name='name']").val(), 
-				port: $("#worldCreateForm").find("input[name='port']").val(), 
-				cap: $("#worldCreateForm").find("input[name='capacity']").val(), 
-			},
-			success: function (){
-				alert('ok');
-			},
-			error: function(){
-				alert('error');
-			}
-		});
-	});
-
-</script>

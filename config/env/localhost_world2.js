@@ -19,7 +19,7 @@ var _replSet = {
 	},
 };
 
-module.exports = {
+module.exports.sys = {
 
 	// do not change salt too often in production mode, 
 	// all logined user will be kicked out at ur own risk;
@@ -37,10 +37,9 @@ module.exports = {
 	},
 
 	database: {
-		'default': 'mongo_gdHub',
 
 		mongo_gdHub: {
-			module: 'sails-mongo',
+			adapter: 'sails-mongo',
 	    user: 'gdHub',
 	    password: '1q2w3e4R',
 	    database: 'gdHub',
@@ -49,7 +48,7 @@ module.exports = {
 		},
 
 		mongo_gdGame2: {
-			module: 'sails-mongo',
+			adapter: 'sails-mongo',
 	    user: 'gdGame2',
 	    password: '1q2w3e4R',
 	    database: 'gdGame2',

@@ -24,7 +24,8 @@ var _fields = {
   	{ type: 'string',  minLength: 4, maxLength: 32, },
 };
 
-var World = BaseModel.extend(_fields, "mongo_gdHub");
+var World = BaseModel.extend(_fields);
+
 World.classname = "World";
 var self = World;
 
@@ -82,7 +83,7 @@ World.createOne = function(name, port, cap, cb) {
 
 	this
 		.create(world)
-		.done(function(err, data){
+		.exec(function(err, data){
 			cb(err, data);
 		});
 

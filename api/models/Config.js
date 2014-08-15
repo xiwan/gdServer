@@ -9,16 +9,16 @@ var _fields = {
 			{ type: 'string', maxLength: 128, required: true, },
 };
 
-var Config = BaseModel.extend(_fields, "mongo_gdHub");
+var Config = BaseModel.extend(_fields);
 Config.classname = "Config";
 var self = Config;
-delete Config.createdAt;
-delete Config.updatedAt;
+delete Config.attributes.createdAt;
+delete Config.attributes.updatedAt;
 
 Config.getOne = function(key, cb){
 	this
 		.findOneByKey(key)
-		.done(function(err, _config){
+		.exec(function(err, _config){
 			if(err) return cb(err);
 			if (_config){
         _config = _config.toJSON();
@@ -30,7 +30,7 @@ Config.getOne = function(key, cb){
 Config.getAll = function(cb) {
 	this
 		.find()
-		.done(function(err, _configs){
+		.exec(function(err, _configs){
 			if(err) return cb(err);
 			if (_configs){
         _configs = _configs.toJSON();

@@ -6,7 +6,7 @@ var CryptUtils = {
 };
 
 CryptUtils.md5 = function (str, digest, cb) {
-	var salt = global.sails.config[sails.config.environment].salt||this.salt;
+	var salt = global.sails.config.sys.salt||this.salt;
 	var md5 = crypto.createHash('md5');
 	var _str = '';
 

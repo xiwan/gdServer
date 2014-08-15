@@ -8,6 +8,7 @@ var self = AdminController;
 
 // list all worlds
 AdminController.index = function(req, res) {
+
 	self.waterfall([
 		function (next) {
 			GateService.listWorld(next);

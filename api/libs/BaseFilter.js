@@ -14,7 +14,8 @@ BaseFilter.prepare = function (req, res, cb){
 	self.debug(req.method, req.port, req.url);
 
 	var lang = req.param("lang");
-	req.locale = (lang)?lang:'en';
+	// req.locale = (lang)?lang:'en';
+	req.setLocale((lang)?lang:'en');
 	req._time = misc.now();
 
 	cb();
@@ -84,6 +85,14 @@ function _afterDestroy(req, res, cb){
 	res.send = null;
 	cb();
 };
+
+// warning: for admin use only function
+BaseFilter.adminSwitchDb = function(req, res, cb) {
+	var conn = req.param('conn')||0;
+	var connName = sails.config.sys.database.keys[conn];
+	
+	sails.switchConnection(connName, cb);
+}
 
 BaseFilter.isAuthed = function(req, res, cb) {
 	
@@ -202,9 +211,9 @@ BaseFilter.isValidVersion = function (req, res, cb) {
 				self.info(">>> version get form cache");
 				next(null, global.v);
 			} else {
-				Config.getOne("v", function(err, result) {
+				MasterVersion.getCurrent(function(err, v) {
 					self.info(">>> version get from db");
-					global.v = _.parseInt(result.value);
+					global.v = _.parseInt(v);
 					next(null, global.v);
 				});
 			}	

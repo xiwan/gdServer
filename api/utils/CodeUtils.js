@@ -19,14 +19,8 @@ function CodeUtils(res, code, params) {
   }
 
   var codeMsg = {};
-  codeMsg.code = CodeUtils.rtnCodes[code]||200;
-  //codeMsg.data = null;
-  if (params){
-    codeMsg.message = res.i18n.apply(this, [codeMsg.code].concat(params));
-    //codeMsg.msg = res.i18n.apply(this, array_merge([codeMsg.code], params));
-  }else{
-    codeMsg.message  = res.i18n(codeMsg.code);
-  }
+  codeMsg.code = (CodeUtils.rtnCodes[code]||200) + "";
+  codeMsg.message = res.i18n.apply(this, [codeMsg.code].concat(params));
   return codeMsg;
 };
 
